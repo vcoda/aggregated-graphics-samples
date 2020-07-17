@@ -6,3 +6,7 @@
 	path = third-party/rapid
 	url = https://github.com/vcoda/rapid.git
 	branch = master
+[submodule "third-party/quadric"]
+	path = third-party/quadric
+	url = https://github.com/vcoda/quadric.git
+	branch = master
