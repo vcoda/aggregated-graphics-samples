@@ -165,6 +165,30 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createMrtPipeline(const ch
         nullptr, nullptr, 0);
 }
 
+std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createFullscreenPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
+    std::shared_ptr<magma::DescriptorSetLayout> setLayout)
+{
+    auto pipelineLayout = std::make_shared<magma::PipelineLayout>(
+         std::move(setLayout));
+    return std::make_shared<magma::GraphicsPipeline>(device,
+        std::vector<magma::PipelineShaderStage>{
+            loadShaderStage(vertexShaderFile),
+            loadShaderStage(fragmentShaderFile)
+        }, magma::renderstates::nullVertexInput,
+        magma::renderstates::triangleStrip,
+        magma::TesselationState(),
+        magma::ViewportState(0.f, 0.f, msaaFramebuffer->getExtent()),
+        magma::renderstates::fillCullBackCW,
+        msaaFramebuffer->getMultisampleState(),
+        magma::renderstates::depthAlwaysDontWrite,
+        magma::renderstates::dontBlendRgb,
+        std::initializer_list<VkDynamicState>{},
+        std::move(pipelineLayout),
+        msaaFramebuffer->getRenderPass(), 0, // subpass
+        pipelineCache,
+        nullptr, nullptr, 0);
+}
+
 void GraphicsApp::updateViewProjTransforms()
 {
     magma::helpers::mapScoped<ViewProjTransforms>(viewProjTransforms,
