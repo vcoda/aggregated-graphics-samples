@@ -60,30 +60,6 @@
     <ClInclude Include="core\string.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="shaders\common.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shaders\cotangentFrame.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shaders\linearizeDepth.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shaders\noise2d.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shaders\poisson8.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shaders\poisson16.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shaders\poisson32.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shaders\sRGB.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
     <ClInclude Include="colorTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -92,6 +68,30 @@
     </ClInclude>
     <ClInclude Include="graphicsApp.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\common\cotangentFrame.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\common\linearizeDepth.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\common\noise2d.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\common\sRGB.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\common\transforms.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\common\poisson8.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\common\poisson16.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\common\poisson32.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
