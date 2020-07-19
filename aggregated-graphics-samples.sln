@@ -37,6 +37,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shadowmapping-poisson", "sh
 		{67B01ECD-2613-4FA0-84F7-87F5BCF40EB1} = {67B01ECD-2613-4FA0-84F7-87F5BCF40EB1}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gbuffer", "gbuffer\gbuffer.vcxproj", "{DB40F084-219C-4A3F-AF5B-09846BF6B91C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8D9D4A3E-439A-4210-8879-259B20D992CA} = {8D9D4A3E-439A-4210-8879-259B20D992CA}
+		{51CC36B3-921E-4853-ACD5-CB6CBC27FBA1} = {51CC36B3-921E-4853-ACD5-CB6CBC27FBA1}
+		{67B01ECD-2613-4FA0-84F7-87F5BCF40EB1} = {67B01ECD-2613-4FA0-84F7-87F5BCF40EB1}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -93,6 +100,14 @@ Global
 		{641158EC-EFBE-4EEA-BC71-014480323E62}.Release|x64.Build.0 = Release|x64
 		{641158EC-EFBE-4EEA-BC71-014480323E62}.Release|x86.ActiveCfg = Release|Win32
 		{641158EC-EFBE-4EEA-BC71-014480323E62}.Release|x86.Build.0 = Release|Win32
+		{DB40F084-219C-4A3F-AF5B-09846BF6B91C}.Debug|x64.ActiveCfg = Debug|x64
+		{DB40F084-219C-4A3F-AF5B-09846BF6B91C}.Debug|x64.Build.0 = Debug|x64
+		{DB40F084-219C-4A3F-AF5B-09846BF6B91C}.Debug|x86.ActiveCfg = Debug|Win32
+		{DB40F084-219C-4A3F-AF5B-09846BF6B91C}.Debug|x86.Build.0 = Debug|Win32
+		{DB40F084-219C-4A3F-AF5B-09846BF6B91C}.Release|x64.ActiveCfg = Release|x64
+		{DB40F084-219C-4A3F-AF5B-09846BF6B91C}.Release|x64.Build.0 = Release|x64
+		{DB40F084-219C-4A3F-AF5B-09846BF6B91C}.Release|x86.ActiveCfg = Release|Win32
+		{DB40F084-219C-4A3F-AF5B-09846BF6B91C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

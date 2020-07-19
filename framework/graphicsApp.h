@@ -29,6 +29,9 @@ protected:
     std::shared_ptr<magma::GraphicsPipeline> createCommonSpecializedPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
         std::shared_ptr<magma::Specialization> specialization, const magma::VertexInputState& vertexInputState,
         std::shared_ptr<magma::DescriptorSetLayout> setLayout);
+    std::shared_ptr<magma::GraphicsPipeline> createMrtPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
+        const magma::VertexInputState& vertexInputState, const magma::MultiColorBlendState& mrtBlendState,
+        std::shared_ptr<magma::aux::Framebuffer> mrtFramebuffer, std::shared_ptr<magma::DescriptorSetLayout> setLayout);
 
     void updateViewProjTransforms();
     void updateObjectTransforms(const std::vector<rapid::matrix, core::aligned_allocator<rapid::matrix>>& worldTransforms);

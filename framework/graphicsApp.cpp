@@ -140,6 +140,31 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createCommonSpecializedPip
         nullptr, nullptr, 0);
 }
 
+std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createMrtPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
+    const magma::VertexInputState& vertexInputState, const magma::MultiColorBlendState& mrtBlendState,
+    std::shared_ptr<magma::aux::Framebuffer> mrtFramebuffer, std::shared_ptr<magma::DescriptorSetLayout> setLayout)
+{
+    auto pipelineLayout = std::make_shared<magma::PipelineLayout>(
+         std::move(setLayout));
+    return std::make_shared<magma::GraphicsPipeline>(device,
+        std::vector<magma::PipelineShaderStage>{
+            loadShaderStage(vertexShaderFile),
+            loadShaderStage(fragmentShaderFile)
+        }, vertexInputState,
+        magma::renderstates::triangleList,
+        magma::TesselationState(),
+        magma::ViewportState(0.f, 0.f, mrtFramebuffer->getExtent()),
+        magma::renderstates::fillCullBackCW,
+        mrtFramebuffer->getMultisampleState(),
+        magma::renderstates::depthLessOrEqual,
+        mrtBlendState,
+        std::initializer_list<VkDynamicState>{},
+        std::move(pipelineLayout),
+        mrtFramebuffer->getRenderPass(), 0, // subpass
+        pipelineCache,
+        nullptr, nullptr, 0);
+}
+
 void GraphicsApp::updateViewProjTransforms()
 {
     magma::helpers::mapScoped<ViewProjTransforms>(viewProjTransforms,
@@ -182,7 +207,10 @@ void GraphicsApp::updateLightSource()
     magma::helpers::mapScoped<LightSource>(lightSource,
         [this](auto *light)
         {
-            light->viewPosition = viewProj->getView() * lightViewProj->getPosition();
+            if (lightViewProj)
+                light->viewPosition = viewProj->getView() * lightViewProj->getPosition();
+            else
+                light->viewPosition = rapid::vector3(0.f);
             light->ambient = sRGBColor(0.4f, 0.4f, 0.4f);
             light->diffuse = sRGBColor(1.f, 1.f, 1.f);
             light->specular = light->diffuse;
