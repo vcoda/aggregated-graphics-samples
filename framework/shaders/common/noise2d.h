@@ -2,7 +2,7 @@
 float hash(vec2 p)
 {
     p = 50. * fract(p * 0.3183099 + vec2(0.71, 0.113));
-    return -1. + 2. * fract(p.x * p.y * (p.x + p.y));
+    return fract(p.x * p.y * (p.x + p.y));
 }
 
 float noise(vec2 p)
