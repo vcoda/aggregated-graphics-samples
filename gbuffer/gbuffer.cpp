@@ -155,15 +155,17 @@ public:
 
     void createGbuffer()
     {
+        constexpr bool depthSampled = true;
+        constexpr bool noDepthPass = false;
         const VkFormat depthFormat = utilities::getSupportedDepthFormat(physicalDevice, false, true);
         gbuffer = std::make_shared<magma::aux::MultiAttachmentFramebuffer>(device,
             std::initializer_list<VkFormat>{
                 VK_FORMAT_R16G16_SFLOAT, // Normal
                 VK_FORMAT_R8G8B8A8_UNORM, // Albedo
                 VK_FORMAT_R8G8B8A8_UNORM}, // Specular
-            depthFormat,
-            framebuffers[FrontBuffer]->getExtent(),
-            true); // Sample depth in shader
+            depthFormat, framebuffers[FrontBuffer]->getExtent(),
+            depthSampled, // Reconstruct position from depth
+            noDepthPass);
     }
 
     void createMeshObjects()

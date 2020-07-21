@@ -29,7 +29,7 @@ void GraphicsApp::createMultisampleFramebuffer(VkFormat colorFormat)
     const VkFormat depthFormat = utilities::getSupportedDepthFormat(physicalDevice, false, true);
     const uint32_t sampleCount = utilities::getSupportedMultisampleLevel(physicalDevice, colorFormat);
     msaaFramebuffer = std::make_unique<magma::aux::ColorMultisampleFramebuffer>(device,
-        colorFormat, depthFormat, framebuffers[FrontBuffer]->getExtent(), sampleCount, false);
+        colorFormat, depthFormat, framebuffers[FrontBuffer]->getExtent(), sampleCount);
     msaaBltRect = std::make_unique<magma::aux::BlitRectangle>(renderPass);
 }
 
@@ -109,6 +109,31 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createShadowMapPipeline(co
         nullptr, nullptr, 0);
  }
 
+std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createDepthOnlyPipeline(const char *vertexShaderFile,
+    const magma::VertexInputState& vertexInputState, std::shared_ptr<magma::DescriptorSetLayout> setLayout,
+    std::shared_ptr<magma::aux::MultiAttachmentFramebuffer> mrtFramebuffer)
+ {
+     auto pipelineLayout = std::make_shared<magma::PipelineLayout>(
+         std::move(setLayout));
+     return std::make_shared<magma::GraphicsPipeline>(device,
+        std::vector<magma::PipelineShaderStage>{
+            loadShaderStage(vertexShaderFile)
+        }, vertexInputState,
+        magma::renderstates::triangleList,
+        magma::TesselationState(),
+        magma::ViewportState(0.f, 0.f, mrtFramebuffer->getExtent()),
+        magma::renderstates::fillCullBackCW,
+        mrtFramebuffer->getMultisampleState(),
+        magma::renderstates::depthLessOrEqual,
+        magma::renderstates::dontWriteRgba,
+        std::initializer_list<VkDynamicState>{},
+        std::move(pipelineLayout),
+        mrtFramebuffer->getDepthRenderPass(), // Define only depth clear/store
+        0, // subpass
+        pipelineCache,
+        nullptr, nullptr, 0);
+ }
+
 std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createCommonPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
         const magma::VertexInputState& vertexInputState, std::shared_ptr<magma::DescriptorSetLayout> setLayout)
 {
@@ -142,7 +167,7 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createCommonSpecializedPip
 
 std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createMrtPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
     const magma::VertexInputState& vertexInputState, const magma::MultiColorBlendState& mrtBlendState,
-    std::shared_ptr<magma::aux::Framebuffer> mrtFramebuffer, std::shared_ptr<magma::DescriptorSetLayout> setLayout)
+    std::shared_ptr<magma::aux::MultiAttachmentFramebuffer> mrtFramebuffer, std::shared_ptr<magma::DescriptorSetLayout> setLayout)
 {
     auto pipelineLayout = std::make_shared<magma::PipelineLayout>(
          std::move(setLayout));
@@ -156,7 +181,7 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createMrtPipeline(const ch
         magma::ViewportState(0.f, 0.f, mrtFramebuffer->getExtent()),
         magma::renderstates::fillCullBackCW,
         mrtFramebuffer->getMultisampleState(),
-        magma::renderstates::depthLessOrEqual,
+        mrtFramebuffer->getDepthRenderPass() ? magma::renderstates::depthEqualDontWrite : magma::renderstates::depthLessOrEqual,
         mrtBlendState,
         std::initializer_list<VkDynamicState>{},
         std::move(pipelineLayout),

@@ -24,6 +24,11 @@ protected:
     std::shared_ptr<magma::GraphicsPipeline> createShadowMapPipeline(const char *vertexShaderFile,
         const magma::VertexInputState& vertexInputState, const magma::RasterizationState& rasterizationState,
         std::shared_ptr<magma::DescriptorSetLayout> setLayout, std::shared_ptr<magma::aux::DepthFramebuffer> framebuffer);
+
+    std::shared_ptr<magma::GraphicsPipeline> createDepthOnlyPipeline(const char *vertexShaderFile,
+        const magma::VertexInputState& vertexInputState, std::shared_ptr<magma::DescriptorSetLayout> setLayout,
+        std::shared_ptr<magma::aux::MultiAttachmentFramebuffer> mrtFramebuffer);
+
     std::shared_ptr<magma::GraphicsPipeline> createCommonPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
         const magma::VertexInputState& vertexInputState, std::shared_ptr<magma::DescriptorSetLayout> setLayout);
     std::shared_ptr<magma::GraphicsPipeline> createCommonSpecializedPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
@@ -31,7 +36,7 @@ protected:
         std::shared_ptr<magma::DescriptorSetLayout> setLayout);
     std::shared_ptr<magma::GraphicsPipeline> createMrtPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
         const magma::VertexInputState& vertexInputState, const magma::MultiColorBlendState& mrtBlendState,
-        std::shared_ptr<magma::aux::Framebuffer> mrtFramebuffer, std::shared_ptr<magma::DescriptorSetLayout> setLayout);
+        std::shared_ptr<magma::aux::MultiAttachmentFramebuffer> mrtFramebuffer, std::shared_ptr<magma::DescriptorSetLayout> setLayout);
     std::shared_ptr<magma::GraphicsPipeline> createFullscreenPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
         std::shared_ptr<magma::DescriptorSetLayout> setLayout);
 

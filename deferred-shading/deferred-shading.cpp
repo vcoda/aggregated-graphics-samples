@@ -24,9 +24,11 @@ class DeferredShading : public GraphicsApp
     std::shared_ptr<magma::aux::MultiAttachmentFramebuffer> gbuffer;
     std::shared_ptr<magma::DynamicUniformBuffer<PhongMaterial>> materials;
     std::shared_ptr<magma::ImageView> normalMap;
+    std::shared_ptr<magma::GraphicsPipeline> depthPipeline;
     std::shared_ptr<magma::GraphicsPipeline> gbufferPipeline;
     std::shared_ptr<magma::GraphicsPipeline> gbufferTexPipeline;
     std::shared_ptr<magma::GraphicsPipeline> deferredPipeline;
+    DescriptorSet depthDescriptor;
     DescriptorSet gbDescriptor;
     DescriptorSet gbTexDescriptor;
     DescriptorSet dsDescriptor;
@@ -178,15 +180,17 @@ public:
 
     void createGbuffer()
     {
+        constexpr bool depthSampled = true;
+        constexpr bool separateDepthPass = true;
         const VkFormat depthFormat = utilities::getSupportedDepthFormat(physicalDevice, false, true);
         gbuffer = std::make_shared<magma::aux::MultiAttachmentFramebuffer>(device,
             std::initializer_list<VkFormat>{
                 VK_FORMAT_R16G16_SFLOAT, // Normal
                 VK_FORMAT_R8G8B8A8_UNORM, // Albedo
                 VK_FORMAT_R8G8B8A8_UNORM}, // Specular
-            depthFormat,
-            framebuffers[FrontBuffer]->getExtent(),
-            true); // Sample depth in shader
+            depthFormat, framebuffers[FrontBuffer]->getExtent(),
+            depthSampled, // Reconstruct position from depth
+            separateDepthPass); // Depth pre-pass for zero overdraw
     }
 
     void createMeshObjects()
@@ -204,7 +208,17 @@ public:
     }
 
     void setupDescriptorSets()
-    {   // 1. G-buffer fill shader
+    {   // 1. Depth pre-pass
+        depthDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
+            {
+                magma::bindings::VertexFragmentStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
+                magma::bindings::FragmentStageBinding(1, magma::descriptors::UniformBuffer(1)),
+                magma::bindings::FragmentStageBinding(2, magma::descriptors::DynamicUniformBuffer(1)),
+            }));
+        depthDescriptor.set = descriptorPool->allocateDescriptorSet(depthDescriptor.layout);
+        depthDescriptor.set->update(0, transforms);
+        depthDescriptor.set->update(1, viewProjTransforms);
+        // 2. G-buffer fill shader
         gbDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
                 magma::bindings::VertexFragmentStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
@@ -215,7 +229,7 @@ public:
         gbDescriptor.set->update(0, transforms);
         gbDescriptor.set->update(1, viewProjTransforms);
         gbDescriptor.set->update(2, materials);
-        // 2. G-buffer fill texture shader
+        // 3. G-buffer fill texture shader
         gbTexDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
                 magma::bindings::VertexFragmentStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
@@ -228,7 +242,7 @@ public:
         gbTexDescriptor.set->update(1, viewProjTransforms);
         gbTexDescriptor.set->update(2, materials);
         gbTexDescriptor.set->update(3, normalMap, anisotropicClampToEdge);
-        // 3. Deferred shading
+        // 4. Deferred shading
         dsDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
                 magma::bindings::VertexStageBinding(1, magma::descriptors::UniformBuffer(1)),
@@ -249,6 +263,10 @@ public:
 
     void setupGraphicsPipelines()
     {
+        depthPipeline = createDepthOnlyPipeline("transform.o",
+            objects[0]->getVertexInput(),
+            depthDescriptor.layout,
+            gbuffer);
         const magma::MultiColorBlendState gbufferBlendState(
             {
                 magma::blendstates::writeRg, // Normal
@@ -274,20 +292,40 @@ public:
         cmdBuffer->begin();
         {
             if (FrontBuffer == bufferIndex)
-                gbufferPass(cmdBuffer); // Draw once
+            {   // Draw once
+                depthPrePass(cmdBuffer);
+                gbufferPass(cmdBuffer);
+            }
             deferredPass(cmdBuffer, bufferIndex);
         }
         cmdBuffer->end();
     }
 
+    void depthPrePass(std::shared_ptr<magma::CommandBuffer> cmdBuffer)
+    {
+        cmdBuffer->beginRenderPass(gbuffer->getDepthRenderPass(), gbuffer->getDepthFramebuffer(),
+            {   // Clear only depth attachment
+                magma::clears::depthOne
+            });
+        {
+            cmdBuffer->bindPipeline(depthPipeline);
+            for (uint32_t i = Cube; i < MaxObjects; ++i)
+            {
+                cmdBuffer->bindDescriptorSet(depthPipeline, depthDescriptor.set,
+                    transforms->getDynamicOffset(i));
+                objects[i]->draw(cmdBuffer);
+            }
+        }
+        cmdBuffer->endRenderPass();
+    }
+
     void gbufferPass(std::shared_ptr<magma::CommandBuffer> cmdBuffer)
     {
         cmdBuffer->beginRenderPass(gbuffer->getRenderPass(), gbuffer->getFramebuffer(),
-            {
+            {   // Clear only color attachments
                 magma::clears::blackColor,
                 magma::ClearColor(0.35f, 0.53f, 0.7f, 1.0f),
-                magma::ClearColor(0.35f, 0.53f, 0.7f, 1.0f),
-                magma::clears::depthOne
+                magma::ClearColor(0.35f, 0.53f, 0.7f, 1.0f)
             });
         {   // 1. Draw objects
             cmdBuffer->bindPipeline(gbufferPipeline);
