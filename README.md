@@ -17,4 +17,10 @@ Percentage closer filtering of shadow map. The technique was first introduced by
 
 Soft shadow rendering with high-quality filtering using [Poisson disk sampling](https://sighack.com/post/poisson-disk-sampling-bridsons-algorithm).
 To overcome hardware limitations, *textureOffset()* function was replaced by *texture()*, which allows to use texture coordinates with arbitrary floating-point offsets. To get rid of pattern artefacts I have implemented jittered sampling. For each fragment *noise()* function generates pseudo-random value that is expanded in [0, 2π] range for an angle in radians to construct rotation matrix. Jittered PCF samples are computed by rotating Poisson disk for each pixel on the screen.
-<br>
+<br><br>
+
+### [Stable Poisson shadow filtering](shadowmapping-poisson-stable/)
+<img src="./screenshots/shadowmapping-poisson-stable.jpg" height="140px" align="left">
+
+In previous implementation Poisson jittering depends on screen position of the fragment. As neighboring fragments have random noise values, they define different rotation matrices. This causes shadow flickering from the filter pattern when shadow or camera is moving. In this demo I use a jitter pattern which is stable in world space. This means the random jitter offset depends on the world space position of the shadowed pixel and not on the screen space position. You can toggle between screen space and world space techniques to see how shadow filtering changes.
+<br><br>
