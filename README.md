@@ -6,6 +6,16 @@ A collection of exemplary graphics samples based on Magma and Vulkan API
 
 Geometric Buffers was first introduced by Saito and Takahashi in [Comprehensible Rendering of 3-D Shapes](https://www.cs.princeton.edu/courses/archive/fall00/cs597b/papers/saito90.pdf) (*Computer Graphics, vol. 24, no. 4, August 1990*). G-buffers preserve geometric properties of the surfaces such as depth or normal. This demo implements G-buffers as multi-attachment framebuffer that stores depth, normal, albedo and specular properties. Normals are encoded into RG16 floating-point format texture using Spheremap Transform (see [Compact Normal Storage for small G-Buffers](https://aras-p.info/texts/CompactNormalStorage.html)). Normals from normal map transformed from texture space to world space using per-pixel TBN matrix, described in [Normal Mapping without Precomputed Tangents](http://www.thetenthplanet.de/archives/1180) (*ShaderX 5, Chapter 2.6, pp. 131 – 140*).
 
+### [Deferred shading](deferred-shading/)
+<img src="./screenshots/deferred-shading.jpg" height="144x" align="left">
+
+Deferred shading was proposed by Deering et al. in [The triangle processor and normal vector shader: a VLSI system for high performance graphics](https://dl.acm.org/doi/abs/10.1145/378456.378468) (*Computer Graphics, vol. 22, no. 4, August 1988*). It normally consists from two passes:
+
+* Positions, normals and surface attributes like albedo and specular are written into G-buffer.
+* Fragment shader computes lighting for each light source, reconstructing position and normal from G-buffer as well as surface parameters for BRDF function.
+
+This implementation performs additional depth pre-pass, in order to achieve zero overdraw in G-buffer. Writing geometry attributes usually requires a lot of memory bandwidth, so it's important to write to G-buffer only once in every pixel. First, depth-only pass writes depth values into G-buffer with *less-equal* depth test enabled. Second, G-buffer pass is performed with depth test enabled as *equal*, but depth write disabled. In Vulkan, for each pass we have to create separate color/depth render passes in order to clear/write only particular framebuffer's attachment(s). To simplify code, deferred shading is performed for single point light source.
+
 ### [Shadow mapping](shadowmapping/)
 <img src="./screenshots/shadowmapping.jpg" height="144x" align="left">
 
