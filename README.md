@@ -11,3 +11,10 @@ Shadow mapping was first introduced by Lance Williams in [Casting curved shadows
 <img src="./screenshots/shadowmapping-pcf.jpg" height="144px" align="left">
 
 Percentage closer filtering of shadow map. The technique was first introduced by Reeves et al. in [Rendering Antialiased Shadows with Depth Maps](https://graphics.pixar.com/library/ShadowMaps/paper.pdf) (*Computer Graphics, vol. 21, no. 4, July 1987*). Unlike normal textures, shadow map textures cannot be prefiltered to remove aliasing. Instead, multiple depth comparisons are made per pixel and averaged together. I have implemented two sampling patterns: regular grid and Poisson sampling. This particular implementation uses *textureOffset()* function with constant offsets to optimize URB usage (see [Performance tuning applications for Intel GEN Graphics for Linux and SteamOS](http://media.steampowered.com/apps/steamdevdays/slides/gengraphics.pdf)). Due to hardware restrictions, texture samples have fixed integer offsets, which reduces anti-aliasing quality.
+
+### [Poisson shadow filtering](shadowmapping-poisson/)
+<img src="./screenshots/shadowmapping-poisson.jpg" height="140px" align="left">
+
+Soft shadow rendering with high-quality filtering using [Poisson disk sampling](https://sighack.com/post/poisson-disk-sampling-bridsons-algorithm).
+To overcome hardware limitations, *textureOffset()* function was replaced by *texture()*, which allows to use texture coordinates with arbitrary floating-point offsets. To get rid of pattern artefacts I have implemented jittered sampling. For each fragment *noise()* function generates pseudo-random value that is expanded in [0, 2π] range for an angle in radians to construct rotation matrix. Jittered PCF samples are computed by rotating Poisson disk for each pixel on the screen.
+<br>
