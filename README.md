@@ -1,6 +1,11 @@
 # aggregated-graphics-samples
 A collection of exemplary graphics samples based on Magma and Vulkan API
 
+### [G-buffer](gbuffer/)
+<img src="./screenshots/gbuffer.jpg" height="144x" align="left">
+
+Geometric Buffers was first introduced by Saito and Takahashi in [Comprehensible Rendering of 3-D Shapes](https://www.cs.princeton.edu/courses/archive/fall00/cs597b/papers/saito90.pdf) (*Computer Graphics, vol. 24, no. 4, August 1990*). G-buffers preserve geometric properties of the surfaces such as depth or normal. This demo implements G-buffers as multi-attachment framebuffer that stores depth, normal, albedo and specular properties. Normals are encoded into RG16 floating-point format texture using Spheremap Transform (see [Compact Normal Storage for small G-Buffers](https://aras-p.info/texts/CompactNormalStorage.html)). Normals from normal map transformed from texture space to world space using per-pixel TBN matrix, described in [Normal Mapping without Precomputed Tangents](http://www.thetenthplanet.de/archives/1180) (*ShaderX 5, Chapter 2.6, pp. 131 – 140*).
+
 ### [Shadow mapping](shadowmapping/)
 <img src="./screenshots/shadowmapping.jpg" height="144x" align="left">
 
