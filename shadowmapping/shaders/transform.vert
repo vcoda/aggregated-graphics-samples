@@ -16,6 +16,6 @@ void main()
 {
     oWorldPos = world * position;
     oViewPos = (worldView * position).xyz;
-    oViewNormal = mat3(normalView) * normal;
+    oViewNormal = mat3(normalMatrix) * normal;
     gl_Position = worldViewProj * position;
 }

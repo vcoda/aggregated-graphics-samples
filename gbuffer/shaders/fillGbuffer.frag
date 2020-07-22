@@ -4,14 +4,14 @@
 
 layout(binding = 2) uniform Material
 {
-    vec4 ambient;
+    vec4 ambient; // ignored
     vec4 diffuse;
     vec4 specular;
     float shininess;
 } surface;
 
-layout(location = 0) in vec3 worldPos;
-layout(location = 1) in vec3 worldNormal;
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 texCoord;
 
 // G-buffer color targets
@@ -29,7 +29,7 @@ vec2 encode(vec3 n)
 
 void main()
 {
-    vec3 viewNormal = mat3(view) * worldNormal;
+    vec3 viewNormal = mat3(normalMatrix) * normal;
     oNormal = encode(normalize(viewNormal));
     oAlbedo = surface.diffuse;
     oSpecular = vec4(surface.specular.rgb, surface.shininess/256.);

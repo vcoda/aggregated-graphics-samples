@@ -8,8 +8,7 @@ struct alignas(16) Transforms
     rapid::matrix worldView;
     rapid::matrix worldViewProj;
     rapid::matrix worldLightProj;
-    rapid::matrix normal; // G = trans(inv(M))
-    rapid::matrix viewNormal; // G = trans(inv(M))
+    rapid::matrix normal; // gl_NormalMatrix = transpose(inverse(gl_ModelViewMatrix))
 };
 
 struct alignas(16) ViewProjTransforms

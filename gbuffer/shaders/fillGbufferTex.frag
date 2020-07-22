@@ -13,8 +13,8 @@ layout(binding = 2) uniform Material
 
 layout(binding = 3) uniform sampler2D normalMap;
 
-layout(location = 0) in vec3 worldPos;
-layout(location = 1) in vec3 worldNormal;
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 texCoord;
 
 // G-buffer color targets
@@ -32,16 +32,18 @@ vec2 encode(vec3 n)
 
 void main()
 {
+    vec3 txNormal = texture(normalMap, texCoord).rgb;
+
     // compute per-pixel cotangent frame
-    vec3 N = normalize(worldNormal);
-    mat3 TBN = cotangentFrame(N, worldPos, texCoord);
+    vec3 N = normalize(normal);
+    mat3 TBN = cotangentFrame(N, position, texCoord);
 
-    // transform from texture space to view space
-    vec3 normal = texture(normalMap, texCoord).rgb * 2. - 1;
-    vec3 worldTexNormal = TBN * normal;
-    vec3 viewTexNormal = mat3(view) * worldTexNormal;
+    // transform from texture space to object space
+    vec3 objNormal = TBN * (txNormal * 2. - 1.);
+    // transform from object space to view space
+    vec3 viewNormal = mat3(normalMatrix) * objNormal;
 
-    oNormal = encode(normalize(viewTexNormal));
+    oNormal = encode(normalize(viewNormal));
     oAlbedo = surface.diffuse;
     oSpecular = vec4(surface.specular.rgb, surface.shininess/256.);
 }

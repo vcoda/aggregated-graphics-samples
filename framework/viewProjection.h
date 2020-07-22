@@ -33,7 +33,6 @@ public:
     void updateView() noexcept;
     void updateProjection(bool flipY = true) noexcept;
     rapid::matrix calculateNormal(const rapid::matrix& world) const noexcept;
-    rapid::matrix calculateViewNormal(const rapid::matrix& world) const noexcept;
     rapid::matrix calculateShadowProj() const noexcept;
 
 private:

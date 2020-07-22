@@ -6,8 +6,8 @@ layout(location = 0) in vec4 position;
 layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 texCoord;
 
-layout(location = 0) out vec3 oWorldPos;
-layout(location = 1) out vec3 oWorldNormal;
+layout(location = 0) out vec3 oPos;
+layout(location = 1) out vec3 oNormal;
 layout(location = 2) out vec2 oTexCoord;
 
 out gl_PerVertex {
@@ -16,8 +16,8 @@ out gl_PerVertex {
 
 void main()
 {
-    oWorldPos = (world * position).xyz;
-    oWorldNormal = mat3(normalWorld) * normal;
+    oPos = position.xyz;
+    oNormal = normal;
     oTexCoord = texCoord;
     gl_Position = worldViewProj * position;
 }

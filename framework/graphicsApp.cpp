@@ -246,7 +246,6 @@ void GraphicsApp::updateObjectTransforms(const std::vector<rapid::matrix, core::
                 it.worldViewProj = world * viewProj->getViewProj();
                 it.worldLightProj = lightViewProj ? world * lightViewProj->getViewProj() : rapid::identity();
                 it.normal = viewProj->calculateNormal(world);
-                it.viewNormal = viewProj->calculateViewNormal(world);
             }
         });
 }

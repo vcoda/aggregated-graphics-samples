@@ -8,8 +8,7 @@ layout(binding = 0, set = 0) uniform Transforms
     mat4 worldView;
     mat4 worldViewProj;
     mat4 worldLightProj;
-    mat4 normalWorld;
-    mat4 normalView;
+    mat4 normalMatrix;
 };
 
 layout(binding = 1, set = 0) uniform ViewProjTransforms

@@ -47,14 +47,7 @@ void ViewProjection::updateProjection(bool flipY /* true */) noexcept
 }
 
 rapid::matrix ViewProjection::calculateNormal(const rapid::matrix& world) const noexcept
-{   // G = trans(inv(M))
-    const rapid::matrix worldInv = rapid::inverse(world);
-    const rapid::matrix normal = rapid::transpose(worldInv);
-    return normal;
-}
-
-rapid::matrix ViewProjection::calculateViewNormal(const rapid::matrix& world) const noexcept
-{   // G = trans(inv(M))
+{   // gl_NormalMatrix = transpose(inverse(gl_ModelViewMatrix))
     const rapid::matrix worldView = world * view;
     const rapid::matrix worldViewInv = rapid::inverse(worldView);
     const rapid::matrix normal = rapid::transpose(worldViewInv);
