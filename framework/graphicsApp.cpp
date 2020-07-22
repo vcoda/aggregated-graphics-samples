@@ -21,7 +21,21 @@ GraphicsApp::GraphicsApp(const AppEntry& entry, const core::tstring& caption, ui
             magma::descriptors::CombinedImageSampler(8)
         }));
 
+    arcball = std::shared_ptr<Trackball>(new Trackball(rapid::vector2(width/2.f, height/2.f), 300.f, false));
     timer = std::make_unique<Timer>();
+}
+
+void GraphicsApp::onMouseMove(int x, int y)
+{
+    arcball->rotate(rapid::vector2((float)x, height - (float)y));
+}
+
+void GraphicsApp::onMouseLButton(bool down, int x, int y)
+{
+    if (down)
+        arcball->touch(rapid::vector2((float)x, height - (float)y));
+    else
+        arcball->release();
 }
 
 void GraphicsApp::createMultisampleFramebuffer(VkFormat colorFormat)
@@ -216,6 +230,8 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createFullscreenPipeline(c
 
 void GraphicsApp::updateViewProjTransforms()
 {
+    viewProj->updateView();
+    viewProj->updateProjection();
     magma::helpers::mapScoped<ViewProjTransforms>(viewProjTransforms,
         [this](auto *transforms)
         {
@@ -252,6 +268,8 @@ void GraphicsApp::updateObjectTransforms(const std::vector<rapid::matrix, core::
 
 void GraphicsApp::updateLightSource()
 {
+    lightViewProj->updateView();
+    lightViewProj->updateProjection();
     magma::helpers::mapScoped<LightSource>(lightSource,
         [this](auto *light)
         {

@@ -144,6 +144,7 @@
     <ClInclude Include="shaders\common\poisson16.h" />
     <ClInclude Include="shaders\common\poisson32.h" />
     <ClInclude Include="shaders\common\poisson8.h" />
+    <ClInclude Include="shaders\common\reconstruct.h" />
     <ClInclude Include="shaders\common\sRGB.h" />
     <ClInclude Include="shaders\common\transforms.h" />
     <ClInclude Include="textureLoader.h" />

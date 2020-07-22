@@ -3,6 +3,7 @@
 #include "core/alignedAllocator.h"
 #include "common.h"
 #include "viewProjection.h"
+#include "arcball.h"
 #include "timer.h"
 
 class GraphicsApp : public VulkanApp
@@ -10,6 +11,8 @@ class GraphicsApp : public VulkanApp
 public:
     GraphicsApp(const AppEntry& entry, const core::tstring& caption,
         uint32_t width, uint32_t height, bool sRGB);
+    virtual void onMouseMove(int x, int y) override;
+    virtual void onMouseLButton(bool down, int x, int y) override;
 
 protected:
     virtual void createMultisampleFramebuffer(VkFormat colorFormat);
@@ -71,5 +74,6 @@ protected:
     std::shared_ptr<magma::Sampler> trilinearClampToEdge;
     std::shared_ptr<magma::Sampler> anisotropicClampToEdge;
 
+    std::shared_ptr<Arcball> arcball;
     std::unique_ptr<Timer> timer;
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include "core/noncopyable.h"
+#include "core/aligned.h"
 #include "rapid/rapid.h"
 
 /*
@@ -11,7 +12,7 @@
     https://www.talisman.org/~erlkonig/misc/shoemake92-arcball.pdf
 */
 
-class Arcball : public core::NonCopyable
+class Arcball : public core::Aligned<16>, public core::NonCopyable
 {
 public:
     Arcball(const rapid::vector2& center, float radius,

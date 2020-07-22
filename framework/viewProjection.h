@@ -39,7 +39,7 @@ private:
     bool lhs;
     rapid::float3 eyePos;
     rapid::float3 focusPos;
-    float fieldOfView = 0.f;
+    float fieldOfView = 45.f;
     float aspectRatio = 1.f;
     float zNear = 0.1f;
     float zFar = 100.f;

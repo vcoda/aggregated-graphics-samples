@@ -2,7 +2,7 @@
 
 ViewProjection::ViewProjection(bool lhs) noexcept:
     lhs(lhs),
-    eyePos(0.f, 0.f, 0.f),
+    eyePos(0.f, 0.f, -1.f),
     focusPos(0.f, 0.f, 0.f)
 {}
 
