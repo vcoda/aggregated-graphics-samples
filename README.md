@@ -1,6 +1,11 @@
 # aggregated-graphics-samples
 A collection of exemplary graphics samples based on Magma and Vulkan API
 
+### [Normal mapping](normalmapping/)
+<img src="./screenshots/normalmapping.jpg" height="144x" align="left">
+
+Normal mapping was first introduced by James F. Blinn in [Simulation of Wrinkled Surfaces](https://www.microsoft.com/en-us/research/publication/simulation-of-wrinkled-surfaces/) (*SIGGRAPH '78: Proceedings of the 5th annual conference on Computer graphics and interactive techniques, August 1978*). A common use of this technique is to greatly enhance the appearance and details of a low polygon model by generating a normal map from a high polygon model or height map. This demo uses normal map stored in BC5 signed normalized format (former [3Dc](https://en.wikipedia.org/wiki/3Dc)) instead of BC2/BC3 (former DXT3/DXT5) because of higher compression ratio. Z component of normal vector is reconstructed in fragment shader. Next, normal transformed from texture space to object space using per-pixel TBN matrix, described in [Normal Mapping without Precomputed Tangents](http://www.thetenthplanet.de/archives/1180) (*ShaderX 5, Chapter 2.6, pp. 131 – 140*). This allows to get rid of precomputing tangents for each vertex. Finally, normal transformed from object space to view space using so-called [Normal Matrix](https://www.lighthouse3d.com/tutorials/glsl-12-tutorial/the-normal-matrix/). Lighting is computed as dot product of the normal vector with light vector, reproducing old **GL_DOT3_RGB** texture combiner operation of [fixed-function hardware](https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_texture_env_dot3.txt).
+
 ### [G-buffer](gbuffer/)
 <img src="./screenshots/gbuffer.jpg" height="144x" align="left">
 
