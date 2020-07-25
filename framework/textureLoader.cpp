@@ -19,11 +19,28 @@ static VkFormat blockCompressedFormat(const gliml::context& ctx)
     }
 }
 
-static void loadBC5SignedNorm(const gliml::dds_header *hdr, VkExtent2D& extent, magma::Image::MipmapLayout& mipOffsets, VkDeviceSize& baseMipOffset)
+static VkFormat blockCompressedExtFormat(unsigned int fourCC)
 {
-    const unsigned char* dataBytePtr = (const unsigned char *)hdr;
-    dataBytePtr += sizeof(gliml::dds_header);
+    switch (fourCC)
+    {
+    // ATI2
+    case MAKEFOURCC('B', 'C', '4', 'U'):
+        return VK_FORMAT_BC4_UNORM_BLOCK;
+    case MAKEFOURCC('B', 'C', '4', 'S'):
+        return VK_FORMAT_BC4_SNORM_BLOCK;
+    // ATI1
+    case MAKEFOURCC('B', 'C', '5', 'U'):
+        return VK_FORMAT_BC5_UNORM_BLOCK;
+    case MAKEFOURCC('B', 'C', '5', 'S'):
+        return VK_FORMAT_BC5_SNORM_BLOCK;
+    default:
+        throw std::invalid_argument("unknown block compressed format");
+        return VK_FORMAT_UNDEFINED;
+    }
+}
 
+static VkFormat loadDxtTextureExt(const gliml::dds_header *hdr, VkExtent2D& extent, magma::Image::MipmapLayout& mipOffsets, VkDeviceSize& baseMipOffset)
+{
     constexpr int MaxNumMipmaps = 16;
     struct Face {
         int numMipmaps;
@@ -36,7 +53,12 @@ static void loadBC5SignedNorm(const gliml::dds_header *hdr, VkExtent2D& extent, 
         } mipmaps[MaxNumMipmaps];
     } face;
 
+    const unsigned char* dataBytePtr = (const unsigned char *)hdr;
+    dataBytePtr += sizeof(gliml::dds_header);
+    const VkFormat format = blockCompressedExtFormat(hdr->ddspf.dwFourCC);
+    const int bytesPerElement = static_cast<int>(magma::Format(format).blockCompressedSize());
     face.numMipmaps = (hdr->dwMipMapCount == 0) ? 1 : hdr->dwMipMapCount;
+
     // For each mipmap
     for (int mipIndex = 0; mipIndex < face.numMipmaps; mipIndex++)
     {
@@ -52,7 +74,6 @@ static void loadBC5SignedNorm(const gliml::dds_header *hdr, VkExtent2D& extent, 
         curMip.height = h;
         curMip.depth = d;
         // Mipmap byte size
-        constexpr int bytesPerElement = 16;
         curMip.size = ((w + 3) / 4) * ((h + 3) / 4) * d * bytesPerElement;
         // Set and advance surface data pointer
         curMip.data = dataBytePtr;
@@ -68,6 +89,7 @@ static void loadBC5SignedNorm(const gliml::dds_header *hdr, VkExtent2D& extent, 
     }
     // Skip DDS header
     baseMipOffset = (const uint8_t *)face.mipmaps[0].data - (const uint8_t *)hdr;
+    return format;
 }
 
 std::shared_ptr<magma::ImageView> loadDxtTexture(std::shared_ptr<magma::CommandBuffer> cmdCopy, const std::string& filename)
@@ -106,9 +128,11 @@ std::shared_ptr<magma::ImageView> loadDxtTexture(std::shared_ptr<magma::CommandB
             const gliml::dds_header *hdr = (const gliml::dds_header *)data;
             switch (hdr->ddspf.dwFourCC)
             {
+            case MAKEFOURCC('B', 'C', '4', 'U'): // ATI2
+            case MAKEFOURCC('B', 'C', '4', 'S'): // ATI2
+            case MAKEFOURCC('B', 'C', '5', 'U'): // ATI1
             case MAKEFOURCC('B', 'C', '5', 'S'): // ATI1
-                format = VK_FORMAT_BC5_SNORM_BLOCK;
-                loadBC5SignedNorm(hdr, extent, mipOffsets, baseMipOffset);
+                format = loadDxtTextureExt(hdr, extent, mipOffsets, baseMipOffset);
                 break;
             default:
                 throw std::runtime_error("unknown compressed format");
