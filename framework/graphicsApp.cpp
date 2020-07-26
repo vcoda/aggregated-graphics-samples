@@ -28,6 +28,7 @@ GraphicsApp::GraphicsApp(const AppEntry& entry, const core::tstring& caption, ui
 void GraphicsApp::onMouseMove(int x, int y)
 {
     arcball->rotate(rapid::vector2((float)x, height - (float)y));
+    VulkanApp::onMouseMove(x, y);
 }
 
 void GraphicsApp::onMouseLButton(bool down, int x, int y)
@@ -36,6 +37,7 @@ void GraphicsApp::onMouseLButton(bool down, int x, int y)
         arcball->touch(rapid::vector2((float)x, height - (float)y));
     else
         arcball->release();
+    VulkanApp::onMouseLButton(down, x, y);
 }
 
 void GraphicsApp::createMultisampleFramebuffer(VkFormat colorFormat)

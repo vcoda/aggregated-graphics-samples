@@ -16,6 +16,9 @@
     <Filter Include="Header Files\core">
       <UniqueIdentifier>{f44e22e2-9fc9-4eb9-9cdc-026008b14e19}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\brdf">
+      <UniqueIdentifier>{4159b9c5-f1c4-414e-849a-9762faeafaf2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h">
@@ -101,6 +104,9 @@
     </ClInclude>
     <ClInclude Include="shaders\common\reconstruct.h">
       <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\common\brdf\phong.h">
+      <Filter>Resource Files\brdf</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

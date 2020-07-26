@@ -137,6 +137,7 @@
     <ClInclude Include="core\string.h" />
     <ClInclude Include="debugOutputStream.h" />
     <ClInclude Include="graphicsApp.h" />
+    <ClInclude Include="shaders\common\brdf\phong.h" />
     <ClInclude Include="shaders\common\cotangentFrame.h" />
     <ClInclude Include="shaders\common\linearizeDepth.h" />
     <ClInclude Include="shaders\common\noise2d.h" />
