@@ -2,17 +2,17 @@
 #include "magma/magma.h"
 #include "gliml/gliml.h"
 
-static VkFormat blockCompressedFormat(const gliml::context& ctx)
+static VkFormat blockCompressedFormat(const gliml::context& ctx, bool sRGB)
 {
     const int internalFormat = ctx.image_internal_format();
     switch (internalFormat)
     {
     case GLIML_GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
-        return VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
+        return sRGB ? VK_FORMAT_BC1_RGBA_SRGB_BLOCK : VK_FORMAT_BC1_RGBA_UNORM_BLOCK;
     case GLIML_GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
-        return VK_FORMAT_BC2_UNORM_BLOCK;
+        return sRGB ? VK_FORMAT_BC2_SRGB_BLOCK : VK_FORMAT_BC2_UNORM_BLOCK;
     case GLIML_GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
-        return VK_FORMAT_BC3_UNORM_BLOCK;
+        return sRGB ? VK_FORMAT_BC3_SRGB_BLOCK : VK_FORMAT_BC3_UNORM_BLOCK;
     default:
         throw std::invalid_argument("unknown block compressed format");
         return VK_FORMAT_UNDEFINED;
@@ -23,12 +23,12 @@ static VkFormat blockCompressedExtFormat(unsigned int fourCC)
 {
     switch (fourCC)
     {
-    // ATI2
+    // ATI1
     case MAKEFOURCC('B', 'C', '4', 'U'):
         return VK_FORMAT_BC4_UNORM_BLOCK;
     case MAKEFOURCC('B', 'C', '4', 'S'):
         return VK_FORMAT_BC4_SNORM_BLOCK;
-    // ATI1
+    // ATI2
     case MAKEFOURCC('B', 'C', '5', 'U'):
         return VK_FORMAT_BC5_UNORM_BLOCK;
     case MAKEFOURCC('B', 'C', '5', 'S'):
@@ -92,7 +92,8 @@ static VkFormat loadDxtTextureExt(const gliml::dds_header *hdr, VkExtent2D& exte
     return format;
 }
 
-std::shared_ptr<magma::ImageView> loadDxtTexture(std::shared_ptr<magma::CommandBuffer> cmdCopy, const std::string& filename)
+std::shared_ptr<magma::ImageView> loadDxtTexture(std::shared_ptr<magma::CommandBuffer> cmdCopy, const std::string& filename,
+    bool sRGB /* false */)
 {
     std::ifstream file("../assets/textures/" + filename, std::ios::in | std::ios::binary | std::ios::ate);
     if (!file.is_open())
@@ -112,7 +113,7 @@ std::shared_ptr<magma::ImageView> loadDxtTexture(std::shared_ptr<magma::CommandB
         ctx.enable_dxt(true);
         if (ctx.load(data, static_cast<unsigned>(size)))
         {   // Setup texture data description
-            format = blockCompressedFormat(ctx);
+            format = blockCompressedFormat(ctx, sRGB);
             extent.width = static_cast<uint32_t>(ctx.image_width(0, 0));
             extent.height = static_cast<uint32_t>(ctx.image_height(0, 0));
             for (int level = 1; level < ctx.num_mipmaps(0); ++level)
@@ -128,10 +129,10 @@ std::shared_ptr<magma::ImageView> loadDxtTexture(std::shared_ptr<magma::CommandB
             const gliml::dds_header *hdr = (const gliml::dds_header *)data;
             switch (hdr->ddspf.dwFourCC)
             {
-            case MAKEFOURCC('B', 'C', '4', 'U'): // ATI2
-            case MAKEFOURCC('B', 'C', '4', 'S'): // ATI2
-            case MAKEFOURCC('B', 'C', '5', 'U'): // ATI1
-            case MAKEFOURCC('B', 'C', '5', 'S'): // ATI1
+            case MAKEFOURCC('B', 'C', '4', 'U'): // ATI1
+            case MAKEFOURCC('B', 'C', '4', 'S'): // ATI1
+            case MAKEFOURCC('B', 'C', '5', 'U'): // ATI2
+            case MAKEFOURCC('B', 'C', '5', 'S'): // ATI2
                 format = loadDxtTextureExt(hdr, extent, mipOffsets, baseMipOffset);
                 break;
             default:

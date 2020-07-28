@@ -270,8 +270,11 @@ void GraphicsApp::updateObjectTransforms(const std::vector<rapid::matrix, core::
 
 void GraphicsApp::updateLightSource()
 {
-    lightViewProj->updateView();
-    lightViewProj->updateProjection();
+    if (lightViewProj)
+    {
+        lightViewProj->updateView();
+        lightViewProj->updateProjection();
+    }
     magma::helpers::mapScoped<LightSource>(lightSource,
         [this](auto *light)
         {
