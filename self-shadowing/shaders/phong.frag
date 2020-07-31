@@ -8,12 +8,11 @@
 
 layout(constant_id = 0) const bool c_selfShadowing = false;
 
-layout(binding = 2) uniform Light
-{
+layout(binding = 2) uniform Light {
     vec4 viewPos;
-	vec4 ambient;
-	vec4 diffuse;
-	vec4 specular;
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;
 } light;
 
 layout(binding = 3) uniform sampler2D diffuseMap;
@@ -46,12 +45,6 @@ void main()
     vec3 N = normalize(normal);
     mat3 TBN = cotangentFrame(N, position, texCoord);
 
-    // transform from texture space to object space
-    vec3 micronormal = TBN * reconstructNormal(nxy);
-    // transform from object space to view space
-    micronormal = mat3(normalMatrix) * micronormal;
-
-    vec3 n = normalize(micronormal);
     vec3 l = normalize(light.viewPos.xyz - viewPos);
     vec3 v = -normalize(viewPos);
 
@@ -61,6 +54,11 @@ void main()
         vec3 n = normalize(viewNormal);
         self = selfshadowing(n, l, 1./8.);
     }
+
+    // transform from texture space to object space
+    vec3 micronormal = TBN * reconstructNormal(nxy);
+    // transform from object space to view space
+    vec3 n = mat3(normalMatrix) * micronormal;
 
     vec3 srgbAlbedo = sRGB(albedo);
     vec3 ambient = linear(0.2 * srgbAlbedo);

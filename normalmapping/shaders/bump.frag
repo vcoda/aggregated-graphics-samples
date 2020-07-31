@@ -7,8 +7,7 @@
 
 layout(constant_id = 0) const bool c_showNormals = false;
 
-layout(binding = 2) uniform Light
-{
+layout(binding = 2) uniform Light {
     vec3 viewPos;
 } light;
 
@@ -29,17 +28,18 @@ void main()
     vec3 N = normalize(normal);
     mat3 TBN = cotangentFrame(N, position, texCoord);
 
-    // transform from texture space to object space
-    vec3 normal = TBN * reconstructNormal(nxy);
-    // transform from object space to view space
-    vec3 viewNormal = mat3(normalMatrix) * normal;
-
-    vec3 n = normalize(viewNormal);
     vec3 l = normalize(light.viewPos - viewPos);
+
+    // transform from texture space to object space
+    vec3 micronormal = TBN * reconstructNormal(nxy);
+    // transform from object space to view space
+    vec3 n = mat3(normalMatrix) * micronormal;
+    n = normalize(n);
+
     float NdL = dot(n, l);
 
     if (c_showNormals)
-        oColor = linear(normal * .5 + .5);
+        oColor = linear(micronormal * .5 + .5);
     else
         oColor = vec3(max(NdL, 0.));
 }

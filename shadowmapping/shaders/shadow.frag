@@ -3,8 +3,7 @@
 #include "common/transforms.h"
 #include "common/sRGB.h"
 
-layout(binding = 2) uniform LightSource
-{
+layout(binding = 2) uniform LightSource {
     vec4 viewPos;
 } light;
 
@@ -24,8 +23,9 @@ void main()
     vec3 n = normalize(viewNormal);
     vec3 l = normalize(light.viewPos.xyz - viewPos);
     float NdL = dot(n, l);
-    vec3 floral_white = linear(vec3(1.0, 0.98, 0.941));
-    float ambient = linear(0.16);
+
+    const vec3 floral_white = linear(vec3(1.0, 0.98, 0.941));
+    const float ambient = linear(0.16);
 
     oColor = ambient + max(NdL, 0.) * floral_white * shadow;
 }

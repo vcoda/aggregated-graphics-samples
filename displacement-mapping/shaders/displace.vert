@@ -2,8 +2,7 @@
 #extension GL_GOOGLE_include_directive : enable
 #include "common/transforms.h"
 
-layout(binding = 4) uniform Parameters
-{
+layout(binding = 4) uniform Parameters {
     vec4 screenSize;
     float displacement;
 };

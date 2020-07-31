@@ -2,8 +2,7 @@
 #extension GL_GOOGLE_include_directive : enable
 #include "common/transforms.h"
 
-layout(binding = 2) uniform Material
-{
+layout(binding = 2) uniform Material {
     vec4 ambient; // ignored
     vec4 diffuse;
     vec4 specular;

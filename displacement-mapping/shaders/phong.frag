@@ -7,24 +7,21 @@
 
 layout(constant_id = 0) const bool c_showNormals = false;
 
-layout(binding = 2) uniform Light
-{
+layout(binding = 2) uniform Light {
     vec4 viewPos;
     vec4 ambient;
     vec4 diffuse;
     vec4 specular;
 } light;
 
-layout(binding = 3) uniform Material
-{
+layout(binding = 3) uniform Material {
     vec4 ambient;
     vec4 diffuse;
     vec4 specular;
     float shininess;
 } surface;
 
-layout(binding = 4) uniform Parameters
-{
+layout(binding = 4) uniform Parameters {
     vec4 screenSize;
     float displacement;
 };
@@ -46,14 +43,14 @@ void main()
     vec3 N = normalize(normal);
     mat3 TBN = cotangentFrame(N, position, texCoord);
 
-    // transform from texture space to object space
-    vec3 normal = TBN * (micronormal * 2. - 1.);
-    // transform from object space to view space
-    vec3 viewNormal = mat3(normalMatrix) * normal;
-
-    vec3 n = normalize(viewNormal);
     vec3 l = normalize(light.viewPos.xyz - viewPos);
     vec3 v = -normalize(viewPos);
+
+    // transform from texture space to object space
+    micronormal = TBN * normalize(micronormal * 2. - 1.);
+    // transform from object space to view space
+    vec3 n = mat3(normalMatrix) * micronormal;
+    n = normalize(n);
 
     oColor = phong(n, l, v,
         surface.ambient.rgb, light.ambient.rgb,
@@ -64,6 +61,6 @@ void main()
     if (c_showNormals)
     {
         if (gl_FragCoord.x > screenSize.x * 0.5)
-            oColor = linear(normal * .5 + .5);
+            oColor = linear(micronormal * .5 + .5);
     }
 }

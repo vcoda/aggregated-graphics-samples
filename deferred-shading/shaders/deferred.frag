@@ -1,7 +1,8 @@
 #version 450
 #extension GL_GOOGLE_include_directive : enable
 #include "common/transforms.h"
-#include "common/sRGB.h"
+#include "common/reconstruct.h"
+#include "common/brdf/phong.h"
 
 struct Gbuffer
 {
@@ -41,15 +42,6 @@ vec3 decode(vec2 enc)
     return nn.xyz * 2. + vec3(0., 0., -1.);
 }
 
-// https://mynameismjp.wordpress.com/2009/03/10/reconstructing-position-from-depth/
-vec3 reconstructViewPos(vec2 xy, float z)
-{
-    //z = z * 2. - 1.; // skip in Vulkan
-    vec4 clipPos = vec4(xy, z, 1.);
-    vec4 viewPos = projInv * clipPos;
-    return viewPos.xyz/viewPos.w;
-}
-
 Gbuffer loadGbuffer()
 {
     Gbuffer gbuffer;
@@ -64,18 +56,6 @@ Gbuffer loadGbuffer()
     return gbuffer;
 }
 
-vec3 phong(vec3 n, vec3 l, vec3 v,
-           vec3 Ka, vec3 Ia,
-           vec3 Kdiff, vec3 Idiff,
-           vec3 Kspec, vec3 Ispec,
-           float shininess)
-{
-    float NdL = max(dot(n, l), 0.);
-    vec3 r = reflect(-l, n);
-    float RdV = max(dot(r, v), 0.);
-    return Ka * Ia + (Kdiff * NdL * Idiff) + (Kspec * pow(RdV, shininess) * Ispec);
-}
-
 void main()
 {
     Gbuffer gbuffer = loadGbuffer();
@@ -87,10 +67,9 @@ void main()
     vec3 l = normalize(light.viewPos.xyz - viewPos);
     vec3 v = normalize(-viewPos); // view position at (0, 0, 0)
 
-    vec3 surfaceAmbient = gbuffer.albedo.rgb * gbuffer.ambient;
     oColor = phong(n, l, v,
-        surfaceAmbient, light.ambient.rgb,
+        gbuffer.albedo.rgb * gbuffer.ambient, light.ambient.rgb,
         gbuffer.albedo.rgb, light.diffuse.rgb,
         gbuffer.specular.rgb, light.specular.rgb,
-        gbuffer.shininess);
+        gbuffer.shininess, 1.);
 }

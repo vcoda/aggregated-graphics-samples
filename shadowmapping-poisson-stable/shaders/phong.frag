@@ -3,6 +3,8 @@
 #include "common/transforms.h"
 #include "common/noise2d.h"
 #include "common/noise3d.h"
+#include "common/jitter.h"
+#include "common/brdf/phong.h"
 #include "pcf.h"
 
 #include "common/linearizeDepth.h"
@@ -10,24 +12,21 @@
 layout(constant_id = 0) const bool c_screenSpaceNoise = true;
 layout(constant_id = 1) const bool c_showNoise = false;
 
-layout(binding = 2) uniform Light
-{
+layout(binding = 2) uniform Light {
     vec4 viewPos;
     vec4 ambient;
     vec4 diffuse;
     vec4 specular;
 } light;
 
-layout(binding = 3) uniform Material
-{
+layout(binding = 3) uniform Material {
     vec4 ambient;
     vec4 diffuse;
     vec4 specular;
     float shininess;
 } surface;
 
-layout(binding = 4) uniform Parameters
-{
+layout(binding = 4) uniform Parameters {
     vec4 screenSize; // x, y, 1/x, 1/y
     float radius;
     float zbias;
@@ -39,7 +38,6 @@ layout(binding = 5) uniform sampler2DShadow shadowMap;
 layout(location = 0) in vec4 worldPos;
 layout(location = 1) in vec3 viewPos;
 layout(location = 2) in vec3 viewNormal;
-layout(location = 3) in vec2 texCoord;
 
 layout(location = 0) out vec3 oColor;
 
@@ -55,32 +53,6 @@ float worldNoise(vec3 worldPos, float z, float density)
 {
     float w = 1./z;
     return noise(worldPos * density * w);
-}
-
-mat2 jitter(float a, float x, float y)
-{
-    float s = sin(a);
-    float c = cos(a);
-    mat2 rot = mat2(
-        c,-s,
-        s, c);
-    mat2 scale = mat2(
-        x, 0.,
-        0., y);
-    return rot * scale;
-}
-
-vec3 phong(vec3 n, vec3 l, vec3 v,
-           vec3 Ka, vec3 Ia,
-           vec3 Kdiff, vec3 Idiff,
-           vec3 Kspec, vec3 Ispec,
-           float shininess,
-           float shadow)
-{
-    float NdL = max(dot(n, l), 0.);
-    vec3 r = reflect(-l, n);
-    float RdV = max(dot(r, v), 0.);
-    return Ka * Ia + shadow * (Kdiff * NdL * Idiff) + (Kspec * pow(RdV, shininess) * Ispec);
 }
 
 void main()

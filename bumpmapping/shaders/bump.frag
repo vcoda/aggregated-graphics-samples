@@ -7,8 +7,7 @@
 
 layout(constant_id = 0) const bool c_showHeightmap = false;
 
-layout(binding = 2) uniform Light
-{
+layout(binding = 2) uniform Light {
     vec3 viewPos;
 } light;
 
@@ -25,19 +24,20 @@ void main()
 {
     // compute normal from height map (8 texture samples)
     const float strength = 6.;
-    vec3 mapNormal = sobel(heightMap, texCoord, strength);
+    vec3 micronormal = sobel(heightMap, texCoord, strength);
 
     // compute per-pixel cotangent frame
     vec3 N = normalize(normal);
     mat3 TBN = cotangentFrame(N, position, texCoord);
 
-    // transform from texture space to object space
-    vec3 normal = TBN * mapNormal;
-    // transform from object space to view space
-    vec3 viewNormal = mat3(normalMatrix) * normal;
-
-    vec3 n = normalize(viewNormal);
     vec3 l = normalize(light.viewPos - viewPos);
+
+    // transform from texture space to object space
+    micronormal = TBN * micronormal;
+    // transform from object space to view space
+    vec3 n = mat3(normalMatrix) * micronormal;
+    n = normalize(n);
+
     float NdL = dot(n, l);
 
     if (c_showHeightmap)

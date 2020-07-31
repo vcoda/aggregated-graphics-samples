@@ -3,8 +3,7 @@
 #include "common/transforms.h"
 #include "common/cotangentFrame.h"
 
-layout(binding = 2) uniform Material
-{
+layout(binding = 2) uniform Material {
     vec4 ambient;
     vec4 diffuse;
     vec4 specular;
@@ -18,7 +17,7 @@ layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 texCoord;
 
 // G-buffer color targets
-layout(location = 0) out vec2 oNormal;
+layout(location = 0) out vec2 oViewNormal;
 layout(location = 1) out vec4 oAlbedo;
 layout(location = 2) out vec4 oSpecular;
 
@@ -32,18 +31,18 @@ vec2 encode(vec3 n)
 
 void main()
 {
-    vec3 txNormal = texture(normalMap, texCoord).rgb;
+    vec3 micronormal = texture(normalMap, texCoord).rgb;
 
     // compute per-pixel cotangent frame
     vec3 N = normalize(normal);
     mat3 TBN = cotangentFrame(N, position, texCoord);
 
     // transform from texture space to object space
-    vec3 objNormal = TBN * (txNormal * 2. - 1.);
+    micronormal = TBN * normalize(micronormal * 2. - 1.);
     // transform from object space to view space
-    vec3 viewNormal = mat3(normalMatrix) * objNormal;
+    vec3 viewNormal = mat3(normalMatrix) * micronormal;
 
-    oNormal = encode(normalize(viewNormal));
+    oViewNormal = encode(viewNormal);
     oAlbedo = surface.diffuse;
     oSpecular = vec4(surface.specular.rgb, surface.shininess/256.);
 }

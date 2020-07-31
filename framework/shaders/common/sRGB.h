@@ -17,9 +17,9 @@ vec3 sRGB(vec3 cl)
 
 float linear(float cs)
 {
-    cs = clamp(cs, 0.0, 1.0);
+    cs = clamp(cs, 0., 1.);
     if (cs <= 0.04045)
-        return cs / 12.92;
+        return cs/12.92;
     return pow((cs + 0.055)/1.055, 2.4);
 }
 
