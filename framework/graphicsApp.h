@@ -42,6 +42,9 @@ protected:
         std::shared_ptr<magma::aux::MultiAttachmentFramebuffer> mrtFramebuffer, std::shared_ptr<magma::DescriptorSetLayout> setLayout);
     std::shared_ptr<magma::GraphicsPipeline> createFullscreenPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
         std::shared_ptr<magma::DescriptorSetLayout> setLayout);
+    std::shared_ptr<magma::GraphicsPipeline> createFullscreenPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
+        std::shared_ptr<magma::Specialization> specialization, std::shared_ptr<magma::DescriptorSetLayout> setLayout,
+        std::shared_ptr<magma::aux::Framebuffer> framebuffer);
 
     void updateViewProjTransforms();
     void updateObjectTransforms(const std::vector<rapid::matrix, core::aligned_allocator<rapid::matrix>>& worldTransforms);
