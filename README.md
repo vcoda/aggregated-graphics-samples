@@ -36,6 +36,11 @@ Deferred shading was proposed by Deering et al. in [The triangle processor and n
 
 This implementation performs additional depth pre-pass, in order to achieve zero overdraw in G-buffer. Writing geometry attributes usually requires a lot of memory bandwidth, so it's important to write to G-buffer only once in every pixel. First, depth-only pass writes depth values into G-buffer with *less-equal* depth test enabled. Second, G-buffer pass is performed with depth test enabled as *equal*, but depth write disabled. In Vulkan, for each pass we have to create separate color/depth render passes in order to clear/write only particular framebuffer's attachment(s). To simplify code, deferred shading is performed for single point light source.
 
+### [Seascape](seascape/)
+<img src="./screenshots/seascape.jpg" height="144x" align="left">
+
+This demo is an extension of the [vertex texture fetch](vertex-texture-fetch/). In addition to displacement mapping, it performs water shading based on [Beer–Lambert law](https://en.wikipedia.org/wiki/Beer%E2%80%93Lambert_law). First, seabed is represented algebraically as plane in view space. Then two distances on the ray from eye point are computed: distance to intersection point of the ray and plane and distance to water surface. Absorption length gives us an attenuation of the light that is travelled through the water, it could be interpreted as refracted color of the water. Next, the reflection of incident vector and surface normal is computed using *reflect()* function, it's used to lookup reflected color in cubemap texture. Then reflected and refracted colors are mixed using [Schlick's approximation](https://en.wikipedia.org/wiki/Schlick's_approximation) of Fresnel reflectance. Finally, specular reflection from directional light is computed and added to the soup.
+
 ### [Shadow mapping](shadowmapping/)
 <img src="./screenshots/shadowmapping.jpg" height="144x" align="left">
 
