@@ -11,6 +11,7 @@ GraphicsApp::GraphicsApp(const AppEntry& entry, const core::tstring& caption, ui
     createSamplers();
     allocateViewProjTransforms();
 
+    sysUniforms = std::make_shared<magma::UniformBuffer<SysUniforms>>(device);
     lightSource = std::make_shared<magma::UniformBuffer<LightSource>>(device);
 
     constexpr uint32_t maxDescriptorSets = 20;
@@ -29,6 +30,8 @@ void GraphicsApp::onMouseMove(int x, int y)
 {
     arcball->rotate(rapid::vector2((float)x, height - (float)y));
     VulkanApp::onMouseMove(x, y);
+    mouseX = x;
+    mouseY = y;
 }
 
 void GraphicsApp::onMouseLButton(bool down, int x, int y)
@@ -37,6 +40,8 @@ void GraphicsApp::onMouseLButton(bool down, int x, int y)
         arcball->touch(rapid::vector2((float)x, height - (float)y));
     else
         arcball->release();
+    mouseX = x;
+    mouseY = y;
     VulkanApp::onMouseLButton(down, x, y);
 }
 
@@ -273,6 +278,21 @@ void GraphicsApp::updateViewProjTransforms()
             transforms->shadowProj = lightViewProj ? lightViewProj->calculateShadowProj() : rapid::identity();
         });
     updateLightSource(); // View-dependent
+}
+
+void GraphicsApp::updateSysUniforms()
+{
+    magma::helpers::mapScoped<SysUniforms>(sysUniforms,
+        [this](auto *sys)
+        {
+            static float time = 0.0f;
+            time += timer->secondsElapsed();
+
+            sys->time = time;
+            sys->screenSize = rapid::float4a(float(width), float(height), 1.f/width, 1.f/height);
+            sys->mousePos.x = (float)mouseX;
+            sys->mousePos.y = (float)mouseY;
+        });
 }
 
 void GraphicsApp::updateObjectTransforms(const std::vector<rapid::matrix, core::aligned_allocator<rapid::matrix>>& worldTransforms)

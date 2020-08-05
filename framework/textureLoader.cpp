@@ -151,3 +151,46 @@ std::shared_ptr<magma::ImageView> loadDxtTexture(std::shared_ptr<magma::CommandB
     // Create image view
     return std::make_shared<magma::ImageView>(std::move(image));
 }
+
+std::shared_ptr<magma::ImageView> loadDxtCubeTexture(const std::string& filename, std::shared_ptr<magma::CommandBuffer> cmdCopy,
+    bool sRGB /* false */)
+{
+    std::ifstream file("../assets/textures/" + filename, std::ios::in | std::ios::binary | std::ios::ate);
+    if (!file.is_open())
+        throw std::runtime_error("failed to open file \"../assets/textures/" + filename + "\"");
+    const std::streamoff size = file.tellg();
+    file.seekg(0, std::ios::beg);
+    gliml::context ctx;
+    VkDeviceSize baseMipOffset = 0;
+    std::shared_ptr<magma::SrcTransferBuffer> buffer = std::make_shared<magma::SrcTransferBuffer>(cmdCopy->getDevice(), size);
+    magma::helpers::mapScoped<uint8_t>(buffer, [&](uint8_t *data)
+    {   // Read data from file
+        file.read(reinterpret_cast<char *>(data), size);
+        ctx.enable_dxt(true);
+        if (!ctx.load(data, static_cast<unsigned>(size)))
+            throw std::runtime_error("failed to load DDS texture");
+        // Skip DDS header
+        baseMipOffset = reinterpret_cast<const uint8_t *>(ctx.image_data(0, 0)) - data;
+    });
+    // Setup texture data description
+    const VkFormat format = blockCompressedFormat(ctx, sRGB);
+    const uint32_t dimension = ctx.image_width(0, 0);
+    magma::Image::MipmapLayout mipOffsets;
+    VkDeviceSize lastMipSize = 0;
+    for (int face = 0; face < ctx.num_faces(); ++face)
+    {
+        mipOffsets.push_back(lastMipSize);
+        const int mipLevels = ctx.num_mipmaps(face);
+        for (int level = 1; level < mipLevels; ++level)
+        {   // Compute relative offset
+            const intptr_t mipOffset = (const uint8_t *)ctx.image_data(face, level) - (const uint8_t *)ctx.image_data(face, level - 1);
+            mipOffsets.push_back(mipOffset);
+        }
+        lastMipSize = ctx.image_size(face, mipLevels - 1);
+    }
+    // Upload texture data from buffer
+    magma::Image::CopyLayout bufferLayout{baseMipOffset, 0, 0};
+    std::shared_ptr<magma::ImageCube> image = std::make_shared<magma::ImageCube>(cmdCopy, format, dimension, ctx.num_mipmaps(0), buffer, mipOffsets, bufferLayout);
+    // Create image view
+    return std::make_shared<magma::ImageView>(std::move(image));
+}

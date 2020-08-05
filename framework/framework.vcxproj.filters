@@ -111,6 +111,18 @@
     <ClInclude Include="shaders\common\jitter.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="shaders\common\absorption.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\common\ior.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\common\ray.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\common\brdf\schlick.h">
+      <Filter>Resource Files\brdf</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arcball.cpp">

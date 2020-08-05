@@ -9,6 +9,14 @@
 class GraphicsApp : public VulkanApp
 {
 public:
+    struct alignas(16) SysUniforms
+    {
+        float time;
+        rapid::float4a screenSize; // x, y, 1/x, 1/y
+        rapid::float2a mousePos;
+    };
+
+public:
     GraphicsApp(const AppEntry& entry, const core::tstring& caption,
         uint32_t width, uint32_t height, bool sRGB);
     virtual void onMouseMove(int x, int y) override;
@@ -46,6 +54,7 @@ protected:
         std::shared_ptr<magma::Specialization> specialization, std::shared_ptr<magma::DescriptorSetLayout> setLayout,
         std::shared_ptr<magma::aux::Framebuffer> framebuffer);
 
+    void updateSysUniforms();
     void updateViewProjTransforms();
     void updateObjectTransforms(const std::vector<rapid::matrix, core::aligned_allocator<rapid::matrix>>& worldTransforms);
     virtual void updateLightSource();
@@ -63,6 +72,7 @@ protected:
     std::unique_ptr<ViewProjection> lightViewProj;
     std::unique_ptr<magma::aux::BlitRectangle> bltRect;
 
+    std::shared_ptr<magma::UniformBuffer<SysUniforms>> sysUniforms;
     std::shared_ptr<magma::DynamicUniformBuffer<Transforms>> transforms;
     std::shared_ptr<magma::UniformBuffer<ViewProjTransforms>> viewProjTransforms;
     std::shared_ptr<magma::UniformBuffer<LightSource>> lightSource;
@@ -79,4 +89,6 @@ protected:
 
     std::shared_ptr<Arcball> arcball;
     std::unique_ptr<Timer> timer;
+    int mouseX = 0;
+    int mouseY = 0;
 };
