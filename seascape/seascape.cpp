@@ -37,16 +37,15 @@ class Seascape : public GraphicsApp
 
     const float seaDepth = -5.;
     const rapid::plane seabedPlane = rapid::plane(0.f, 1.f, 0.f, -seaDepth);
-    rapid::matrix objTransform;
     bool wireframe = false;
 
 public:
     explicit Seascape(const AppEntry& entry):
         GraphicsApp(entry, TEXT("Seascape"), 1280, 720, true)
     {
+        createTransformBuffer(1);
         setupViewProjection();
         setupMaterials();
-        setupTransforms();
         createHeightmapFramebuffer();
         createUniformBuffer();
         createGridMesh();
@@ -97,8 +96,7 @@ public:
 
     void updateTransforms()
     {
-        const rapid::matrix rotation = rapid::rotationY(rapid::radians(-spinX/4.f));
-        const rapid::matrix world = objTransform * rotation;
+        const rapid::matrix world = rapid::rotationY(rapid::radians(-spinX/4.f));
         const std::vector<rapid::matrix, core::aligned_allocator<rapid::matrix>> transforms = {
             world
         };
@@ -145,12 +143,6 @@ public:
             });
     }
 
-    void setupTransforms()
-    {
-        createTransformBuffer(1);
-        objTransform = rapid::identity();
-    }
-
     void createHeightmapFramebuffer()
     {
         constexpr VkFormat format = VK_FORMAT_R16_SFLOAT;
@@ -184,7 +176,7 @@ public:
             }));
         hmDescriptor.set = descriptorPool->allocateDescriptorSet(hmDescriptor.layout);
         hmDescriptor.set->update(0, sysUniforms);
-        // 2. Vertex texture fetch & lighting pass
+        // 2. Seascape pass
         vtfDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
                 VertexFragmentStageBinding(0, DynamicUniformBuffer(1)),
