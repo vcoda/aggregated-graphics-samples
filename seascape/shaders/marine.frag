@@ -4,7 +4,7 @@
 #include "common/ray.h"
 #include "common/absorption.h"
 #include "common/ior.h"
-#include "common/brdf/schlick.h"
+#include "brdf/schlick.h"
 #include "sobel.h"
 
 layout(binding = 2) uniform DirectionalLight {

@@ -6,7 +6,12 @@ GraphicsApp::GraphicsApp(const AppEntry& entry, const core::tstring& caption, ui
     VulkanApp(entry, caption, width, height, sRGB)
 {
     initialize();
-    createMultisampleFramebuffer(VK_FORMAT_R8G8B8A8_UNORM);
+	try {
+        // Use 10 bit framebuffer to avoid banding artefacts
+		createMultisampleFramebuffer(VK_FORMAT_A2R10G10B10_UNORM_PACK32);
+	} catch (...) {
+		createMultisampleFramebuffer(VK_FORMAT_R8G8B8A8_UNORM);
+	}
     createDrawCommandBuffer();
     createSamplers();
     allocateViewProjTransforms();
@@ -19,7 +24,9 @@ GraphicsApp::GraphicsApp(const AppEntry& entry, const core::tstring& caption, ui
         {
             magma::descriptors::DynamicUniformBuffer(10),
             magma::descriptors::UniformBuffer(10),
-            magma::descriptors::CombinedImageSampler(8)
+            magma::descriptors::CombinedImageSampler(8),
+            magma::descriptors::StorageBuffer(4),
+            magma::descriptors::DynamicStorageBuffer(4)
         }));
 
     arcball = std::shared_ptr<Trackball>(new Trackball(rapid::vector2(width/2.f, height/2.f), 300.f, false));
@@ -49,6 +56,8 @@ void GraphicsApp::createMultisampleFramebuffer(VkFormat colorFormat)
 {
     const VkFormat depthFormat = utilities::getSupportedDepthFormat(physicalDevice, false, true);
     const uint32_t sampleCount = utilities::getSupportedMultisampleLevel(physicalDevice, colorFormat);
+	if (sampleCount < 2)
+		throw std::exception("framebuffer format doesn't support multisampling");
     msaaFramebuffer = std::make_unique<magma::aux::ColorMultisampleFramebuffer>(device,
         colorFormat, depthFormat, framebuffers[FrontBuffer]->getExtent(), sampleCount);
     msaaBltRect = std::make_unique<magma::aux::BlitRectangle>(renderPass);
@@ -359,4 +368,9 @@ void GraphicsApp::submitCommandBuffers(uint32_t bufferIndex)
         drawSemaphore, // Wait for scene rendering
         renderFinished,
         waitFences[bufferIndex]);
+}
+
+void GraphicsApp::sleep(long ms) noexcept
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }

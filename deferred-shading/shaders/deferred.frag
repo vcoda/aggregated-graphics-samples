@@ -2,7 +2,7 @@
 #extension GL_GOOGLE_include_directive : enable
 #include "common/transforms.h"
 #include "common/reconstruct.h"
-#include "common/brdf/phong.h"
+#include "brdf/phong.h"
 
 struct Gbuffer
 {

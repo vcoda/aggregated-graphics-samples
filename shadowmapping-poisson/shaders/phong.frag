@@ -3,7 +3,7 @@
 #include "common/transforms.h"
 #include "common/noise2d.h"
 #include "common/jitter.h"
-#include "common/brdf/phong.h"
+#include "brdf/phong.h"
 #include "pcf.h"
 
 layout(binding = 2) uniform Light {

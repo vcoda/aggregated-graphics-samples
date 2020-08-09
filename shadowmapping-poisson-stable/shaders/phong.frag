@@ -4,7 +4,7 @@
 #include "common/noise2d.h"
 #include "common/noise3d.h"
 #include "common/jitter.h"
-#include "common/brdf/phong.h"
+#include "brdf/phong.h"
 #include "pcf.h"
 
 #include "common/linearizeDepth.h"

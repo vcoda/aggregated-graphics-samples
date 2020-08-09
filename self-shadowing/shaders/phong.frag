@@ -3,8 +3,8 @@
 #include "common/transforms.h"
 #include "common/reconstruct.h"
 #include "common/cotangentFrame.h"
-#include "common/brdf/phong.h"
 #include "common/sRGB.h"
+#include "brdf/phong.h"
 
 layout(constant_id = 0) const bool c_selfShadowing = false;
 

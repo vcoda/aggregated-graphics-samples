@@ -17,7 +17,7 @@
       <UniqueIdentifier>{f44e22e2-9fc9-4eb9-9cdc-026008b14e19}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files\brdf">
-      <UniqueIdentifier>{4159b9c5-f1c4-414e-849a-9762faeafaf2}</UniqueIdentifier>
+      <UniqueIdentifier>{7dd56707-fa1b-4c1a-a63d-8c48d599c36c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -105,9 +105,6 @@
     <ClInclude Include="shaders\common\reconstruct.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="shaders\common\brdf\phong.h">
-      <Filter>Resource Files\brdf</Filter>
-    </ClInclude>
     <ClInclude Include="shaders\common\jitter.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
@@ -120,7 +117,19 @@
     <ClInclude Include="shaders\common\ray.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="shaders\common\brdf\schlick.h">
+    <ClInclude Include="shaders\brdf\cookTorrance.h">
+      <Filter>Resource Files\brdf</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\brdf\distribution.h">
+      <Filter>Resource Files\brdf</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\brdf\geometric.h">
+      <Filter>Resource Files\brdf</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\brdf\schlick.h">
+      <Filter>Resource Files\brdf</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\brdf\phong.h">
       <Filter>Resource Files\brdf</Filter>
     </ClInclude>
   </ItemGroup>
