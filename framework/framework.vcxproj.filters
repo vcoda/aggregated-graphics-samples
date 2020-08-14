@@ -132,6 +132,9 @@
     <ClInclude Include="shaders\brdf\phong.h">
       <Filter>Resource Files\brdf</Filter>
     </ClInclude>
+    <ClInclude Include="shaders\common\luma.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arcball.cpp">

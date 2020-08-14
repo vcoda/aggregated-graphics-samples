@@ -26,6 +26,8 @@ struct LinearColor : rapid::float4a
     constexpr LinearColor() noexcept: rapid::float4a(0.f, 0.f, 0.f, 1.f) {}
     constexpr LinearColor(const sRGBColor& color) noexcept:
         rapid::float4a(linear(color.x), linear(color.y), linear(color.z), color.w) {}
+    constexpr LinearColor(int r, int g, int b) noexcept:
+        rapid::float4a(r/255.f, g/255.f, b/255.f, 1.f) {}
 
     // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_texture_sRGB.txt
     constexpr float linear(float cs) const noexcept

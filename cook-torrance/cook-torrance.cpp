@@ -39,6 +39,7 @@ class CookTorrance : public GraphicsApp
     std::shared_ptr<magma::StorageBuffer> lightSources;
     std::shared_ptr<magma::UniformBuffer<Roughness>> roughnessUniform;
     std::shared_ptr<magma::DynamicUniformBuffer<RefractiveIndices>> refractiveIndices;
+    std::shared_ptr<magma::DynamicUniformBuffer<LinearColor>> albedoColors;
     std::shared_ptr<magma::GraphicsPipeline> cookTorrancePipeline;
     DescriptorSet descriptor;
 
@@ -52,6 +53,7 @@ public:
         createTransformBuffer(Metal::Max);
         setupViewProjection();
         setupRefractiveIndices();
+        setupAlbedo();
         setupDirectionalLights();
         updateRoughness(roughness);
         createMeshObjects();
@@ -159,6 +161,24 @@ public:
             });
     }
 
+    void setupAlbedo()
+    {
+        albedoColors = std::make_shared<magma::DynamicUniformBuffer<LinearColor>>(device, Metal::Max);
+        magma::helpers::mapScoped<LinearColor>(albedoColors,
+            [this](magma::helpers::AlignedUniformArray<LinearColor>& albedo)
+            {   // https://www.chaosgroup.com/blog/understanding-metalness
+                albedo[Silver] = LinearColor(252, 250, 249);
+                albedo[Aluminium] = LinearColor(230, 233, 235);
+                albedo[Gold] = LinearColor(243, 201, 104);
+                albedo[Copper] = LinearColor(238, 158, 137);
+                albedo[Chromium] = LinearColor(141, 141, 141);
+                albedo[Nickel] = LinearColor(226, 219, 192);
+                albedo[Titanium] = LinearColor(246, 239, 208);
+                albedo[Cobalt] = LinearColor(174, 167, 157);
+                albedo[Platinum] = LinearColor(243, 238, 216);
+            });
+    }
+
     void setupDirectionalLights()
     {
         DirectionalLightSource lights[2];
@@ -184,7 +204,8 @@ public:
                 FragmentStageBinding(1, UniformBuffer(1)),
                 FragmentStageBinding(2, StorageBuffer(1)),
                 FragmentStageBinding(3, UniformBuffer(1)),
-                FragmentStageBinding(4, DynamicUniformBuffer(1))
+                FragmentStageBinding(4, DynamicUniformBuffer(1)),
+                FragmentStageBinding(5, DynamicUniformBuffer(1))
             }));
         descriptor.set = descriptorPool->allocateDescriptorSet(descriptor.layout);
         descriptor.set->update(0, transforms);
@@ -192,6 +213,7 @@ public:
         descriptor.set->update(2, lightSources);
         descriptor.set->update(3, roughnessUniform);
         descriptor.set->update(4, refractiveIndices);
+        descriptor.set->update(5, albedoColors);
     }
 
     void setupGraphicsPipeline()
@@ -222,7 +244,8 @@ public:
                 {
                     cmdBuffer->bindDescriptorSet(cookTorrancePipeline, descriptor.set, {
                         transforms->getDynamicOffset(i),
-                        refractiveIndices->getDynamicOffset(i)
+                        refractiveIndices->getDynamicOffset(i),
+                        albedoColors->getDynamicOffset(i)
                     });
                     teapot->draw(cmdBuffer);
                 }

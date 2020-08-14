@@ -7,12 +7,11 @@ float implicitGeometric(vec3 n, vec3 h, vec3 v, vec3 l, float)
 
 float cookTorranceGeometric(vec3 n, vec3 h, vec3 v, vec3 l, float)
 {
-    float NdH = dot(n, h);
+    float NdH2 = 2. * dot(n, h);
     float NdV = dot(n, v);
     float NdL = dot(n, l);
-    float VdH = dot(v, h);
-    float G = 2. * NdH/VdH * min(NdV, NdL);
-    return min(1., max(G, 0.));
+    float VdH = max(dot(v, h), 1e-6); // avoid division by 0
+    return min(1., min(NdH2 * NdV/VdH, NdH2 * NdL/VdH));
 }
 
 float schlickGeometric(vec3 n, vec3 h, vec3 v, vec3 l, float m)
