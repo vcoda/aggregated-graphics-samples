@@ -2,6 +2,7 @@
 #include "geometric.h"
 #include "distribution.h"
 #include "schlick.h"
+#include "diffuse.h"
 
 vec3 cookTorrance(vec3 n, vec3 l, vec3 v,
     vec3 f0, float roughness,
@@ -31,11 +32,10 @@ vec3 cookTorrance(vec3 n, vec3 l, vec3 v,
 #error geometric function not defined
 #endif
     vec3 spec = F * D * G/max(4. * NdL * NdV, 1e-6);
-#if defined(F_DIFFUSE_NDL)
-    vec3 Fd = fresnelSchlick(f0, NdL);
-#else // UE4 computes it as dot(h, v)
-    vec3 Fd = F;
+#if defined(RD_ASHIKHMIN_SHIRLEY)
+    vec3 diff = ashikhminShirleyDiffuse(albedo, luma709(f0), NdL, NdV);
+#else
+    vec3 diff = albedo/PI * (1. - luma709(F));
 #endif
-    vec3 diff =  albedo * (1. - luma709(Fd))/4.;
-    return Idiff * (max(NdL, 0.) * diff + spec);
+    return Idiff * max(NdL, 0.) * (diff + spec);
 }

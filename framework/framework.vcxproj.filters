@@ -135,6 +135,9 @@
     <ClInclude Include="shaders\common\luma.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="shaders\brdf\diffuse.h">
+      <Filter>Resource Files\brdf</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arcball.cpp">

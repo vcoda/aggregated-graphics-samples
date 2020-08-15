@@ -4,7 +4,7 @@
 #include "common/sRGB.h"
 #define D_BECKMANN
 #define G_COOK_TORRANCE
-#define F_DIFFUSE_NDL
+#define RD_ASHIKHMIN_SHIRLEY
 #include "brdf/cookTorrance.h"
 
 layout(constant_id = 0) const bool c_gammaCorrection = true;

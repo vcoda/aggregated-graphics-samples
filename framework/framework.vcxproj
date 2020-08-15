@@ -138,6 +138,7 @@
     <ClInclude Include="debugOutputStream.h" />
     <ClInclude Include="graphicsApp.h" />
     <ClInclude Include="shaders\brdf\cookTorrance.h" />
+    <ClInclude Include="shaders\brdf\diffuse.h" />
     <ClInclude Include="shaders\brdf\distribution.h" />
     <ClInclude Include="shaders\brdf\geometric.h" />
     <ClInclude Include="shaders\brdf\phong.h" />
