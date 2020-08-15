@@ -137,12 +137,16 @@
     <ClInclude Include="core\string.h" />
     <ClInclude Include="debugOutputStream.h" />
     <ClInclude Include="graphicsApp.h" />
+    <ClInclude Include="shaders\brdf\blinnPhong.h" />
     <ClInclude Include="shaders\brdf\cookTorrance.h" />
     <ClInclude Include="shaders\brdf\diffuse.h" />
     <ClInclude Include="shaders\brdf\distribution.h" />
     <ClInclude Include="shaders\brdf\geometric.h" />
+    <ClInclude Include="shaders\brdf\minnaert.h" />
+    <ClInclude Include="shaders\brdf\orenNayar.h" />
     <ClInclude Include="shaders\brdf\phong.h" />
     <ClInclude Include="shaders\brdf\schlick.h" />
+    <ClInclude Include="shaders\brdf\ward.h" />
     <ClInclude Include="shaders\common\absorption.h" />
     <ClInclude Include="shaders\common\cotangentFrame.h" />
     <ClInclude Include="shaders\common\ior.h" />

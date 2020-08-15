@@ -14,7 +14,6 @@ static VkFormat blockCompressedFormat(const gliml::context& ctx, bool sRGB)
     case GLIML_GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
         return sRGB ? VK_FORMAT_BC3_SRGB_BLOCK : VK_FORMAT_BC3_UNORM_BLOCK;
     default:
-        throw std::invalid_argument("unknown block compressed format");
         return VK_FORMAT_UNDEFINED;
     }
 }
@@ -35,6 +34,21 @@ static VkFormat blockCompressedExtFormat(unsigned int fourCC)
         return VK_FORMAT_BC5_SNORM_BLOCK;
     default:
         throw std::invalid_argument("unknown block compressed format");
+        return VK_FORMAT_UNDEFINED;
+    }
+}
+
+static VkFormat uncompressedRgbaFormat(const gliml::context& ctx, bool sRGB)
+{
+    const int internalFormat = ctx.image_internal_format();
+    switch (internalFormat)
+    {
+    case GLIML_GL_RGBA:
+        return sRGB ? VK_FORMAT_R8G8B8A8_SRGB : VK_FORMAT_R8G8B8A8_UNORM;
+    case GLIML_GL_BGRA:
+        return sRGB ? VK_FORMAT_B8G8R8A8_SRGB : VK_FORMAT_B8G8R8A8_UNORM;
+    default:
+        throw std::invalid_argument("unsupported format");
         return VK_FORMAT_UNDEFINED;
     }
 }
@@ -111,9 +125,12 @@ std::shared_ptr<magma::ImageView> loadDxtTexture(std::shared_ptr<magma::CommandB
         file.read(reinterpret_cast<char *>(data), size);
         file.close();
         ctx.enable_dxt(true);
+        ctx.enable_bgra(true);
         if (ctx.load(data, static_cast<unsigned>(size)))
         {   // Setup texture data description
             format = blockCompressedFormat(ctx, sRGB);
+            if (VK_FORMAT_UNDEFINED == format)
+                format = uncompressedRgbaFormat(ctx, sRGB);
             extent.width = static_cast<uint32_t>(ctx.image_width(0, 0));
             extent.height = static_cast<uint32_t>(ctx.image_height(0, 0));
             for (int level = 1; level < ctx.num_mipmaps(0); ++level)

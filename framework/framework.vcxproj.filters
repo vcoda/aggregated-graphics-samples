@@ -138,6 +138,18 @@
     <ClInclude Include="shaders\brdf\diffuse.h">
       <Filter>Resource Files\brdf</Filter>
     </ClInclude>
+    <ClInclude Include="shaders\brdf\blinnPhong.h">
+      <Filter>Resource Files\brdf</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\brdf\orenNayar.h">
+      <Filter>Resource Files\brdf</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\brdf\minnaert.h">
+      <Filter>Resource Files\brdf</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\brdf\ward.h">
+      <Filter>Resource Files\brdf</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arcball.cpp">

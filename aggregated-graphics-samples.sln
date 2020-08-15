@@ -105,6 +105,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cook-torrance", "cook-torra
 		{67B01ECD-2613-4FA0-84F7-87F5BCF40EB1} = {67B01ECD-2613-4FA0-84F7-87F5BCF40EB1}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "brdf", "brdf\brdf.vcxproj", "{B013429B-E9FC-4097-AC72-D3AE5D5A43EC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8D9D4A3E-439A-4210-8879-259B20D992CA} = {8D9D4A3E-439A-4210-8879-259B20D992CA}
+		{51CC36B3-921E-4853-ACD5-CB6CBC27FBA1} = {51CC36B3-921E-4853-ACD5-CB6CBC27FBA1}
+		{67B01ECD-2613-4FA0-84F7-87F5BCF40EB1} = {67B01ECD-2613-4FA0-84F7-87F5BCF40EB1}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -241,6 +248,14 @@ Global
 		{BD1204E5-C806-45FB-B095-50DB7D323C1D}.Release|x64.Build.0 = Release|x64
 		{BD1204E5-C806-45FB-B095-50DB7D323C1D}.Release|x86.ActiveCfg = Release|Win32
 		{BD1204E5-C806-45FB-B095-50DB7D323C1D}.Release|x86.Build.0 = Release|Win32
+		{B013429B-E9FC-4097-AC72-D3AE5D5A43EC}.Debug|x64.ActiveCfg = Debug|x64
+		{B013429B-E9FC-4097-AC72-D3AE5D5A43EC}.Debug|x64.Build.0 = Debug|x64
+		{B013429B-E9FC-4097-AC72-D3AE5D5A43EC}.Debug|x86.ActiveCfg = Debug|Win32
+		{B013429B-E9FC-4097-AC72-D3AE5D5A43EC}.Debug|x86.Build.0 = Debug|Win32
+		{B013429B-E9FC-4097-AC72-D3AE5D5A43EC}.Release|x64.ActiveCfg = Release|x64
+		{B013429B-E9FC-4097-AC72-D3AE5D5A43EC}.Release|x64.Build.0 = Release|x64
+		{B013429B-E9FC-4097-AC72-D3AE5D5A43EC}.Release|x86.ActiveCfg = Release|Win32
+		{B013429B-E9FC-4097-AC72-D3AE5D5A43EC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
