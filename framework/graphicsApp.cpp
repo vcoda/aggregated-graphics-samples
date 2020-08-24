@@ -6,12 +6,12 @@ GraphicsApp::GraphicsApp(const AppEntry& entry, const core::tstring& caption, ui
     VulkanApp(entry, caption, width, height, sRGB)
 {
     initialize();
-	try {
+    try {
         // Use 10 bit framebuffer to avoid banding artefacts
-		createMultisampleFramebuffer(VK_FORMAT_A2R10G10B10_UNORM_PACK32);
-	} catch (...) {
-		createMultisampleFramebuffer(VK_FORMAT_R8G8B8A8_UNORM);
-	}
+        createMultisampleFramebuffer(VK_FORMAT_A2R10G10B10_UNORM_PACK32);
+    } catch (...) {
+        createMultisampleFramebuffer(VK_FORMAT_R8G8B8A8_UNORM);
+    }
     createDrawCommandBuffer();
     createSamplers();
     allocateViewProjTransforms();
@@ -56,8 +56,8 @@ void GraphicsApp::createMultisampleFramebuffer(VkFormat colorFormat)
 {
     const VkFormat depthFormat = utilities::getSupportedDepthFormat(physicalDevice, false, true);
     const uint32_t sampleCount = utilities::getSupportedMultisampleLevel(physicalDevice, colorFormat);
-	if (sampleCount < 2)
-		throw std::exception("framebuffer format doesn't support multisampling");
+    if (sampleCount < 2)
+        throw std::exception("framebuffer format doesn't support multisampling");
     msaaFramebuffer = std::make_unique<magma::aux::ColorMultisampleFramebuffer>(device,
         colorFormat, depthFormat, framebuffers[FrontBuffer]->getExtent(), sampleCount);
     msaaBltRect = std::make_unique<magma::aux::BlitRectangle>(renderPass);
@@ -118,7 +118,7 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createShadowMapPipeline(co
      const magma::RasterizationState& rasterizationState,
      std::shared_ptr<magma::DescriptorSetLayout> setLayout,
      std::shared_ptr<magma::aux::DepthFramebuffer> framebuffer)
- {
+{
      auto pipelineLayout = std::make_shared<magma::PipelineLayout>(
          std::move(setLayout));
      return std::make_shared<magma::GraphicsPipeline>(device,
@@ -137,7 +137,7 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createShadowMapPipeline(co
         framebuffer->getRenderPass(), 0, // subpass
         pipelineCache,
         nullptr, nullptr, 0);
- }
+}
 
 std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createDepthOnlyPipeline(const char *vertexShaderFile,
     const magma::VertexInputState& vertexInputState, std::shared_ptr<magma::DescriptorSetLayout> setLayout)
@@ -188,7 +188,7 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createDepthOnlyPipeline(co
 }
 
 std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createCommonPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
-        const magma::VertexInputState& vertexInputState, std::shared_ptr<magma::DescriptorSetLayout> setLayout)
+    const magma::VertexInputState& vertexInputState, std::shared_ptr<magma::DescriptorSetLayout> setLayout)
 {
     return createCommonSpecializedPipeline(vertexShaderFile, fragmentShaderFile, nullptr, vertexInputState, std::move(setLayout));
 }
@@ -199,7 +199,7 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createCommonSpecializedPip
 {
     auto pipelineLayout = std::make_shared<magma::PipelineLayout>(
          std::move(setLayout));
-     return std::make_shared<magma::GraphicsPipeline>(device,
+    return std::make_shared<magma::GraphicsPipeline>(device,
         std::vector<magma::PipelineShaderStage>{
             loadShaderStage(vertexShaderFile),
             loadShaderStage(fragmentShaderFile, std::move(specialization))
@@ -298,7 +298,7 @@ void GraphicsApp::updateViewProjTransforms()
 {
     viewProj->updateView();
     viewProj->updateProjection();
-    magma::helpers::mapScoped<ViewProjTransforms>(viewProjTransforms,
+    magma::helpers::mapScoped(viewProjTransforms,
         [this](auto *transforms)
         {
             transforms->view = viewProj->getView();
@@ -314,7 +314,7 @@ void GraphicsApp::updateViewProjTransforms()
 
 void GraphicsApp::updateSysUniforms()
 {
-    magma::helpers::mapScoped<SysUniforms>(sysUniforms,
+    magma::helpers::mapScoped(sysUniforms,
         [this](auto *sys)
         {
             static float time = 0.0f;
@@ -354,7 +354,7 @@ void GraphicsApp::updateLightSource()
         lightViewProj->updateView();
         lightViewProj->updateProjection();
     }
-    magma::helpers::mapScoped<LightSource>(lightSource,
+    magma::helpers::mapScoped(lightSource,
         [this](auto *light)
         {
             if (lightViewProj)

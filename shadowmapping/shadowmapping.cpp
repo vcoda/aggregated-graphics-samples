@@ -125,18 +125,21 @@ public:
     }
 
     void setupDescriptorSets()
-    {   // Shadow map shader
+    {
+        using namespace magma::bindings;
+        using namespace magma::descriptors;
+        // Shadow map shader
         smDescriptor.layout = std::make_shared<magma::DescriptorSetLayout>(device,
-            magma::bindings::VertexStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)));
+            VertexStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)));
         smDescriptor.set = descriptorPool->allocateDescriptorSet(smDescriptor.layout);
         smDescriptor.set->update(0, transforms);
         // Lighting shader
         descriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                magma::bindings::VertexStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(1, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(2, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(3, magma::descriptors::CombinedImageSampler(1))
+                VertexStageBinding(0, DynamicUniformBuffer(1)),
+                FragmentStageBinding(1, UniformBuffer(1)),
+                FragmentStageBinding(2, UniformBuffer(1)),
+                FragmentStageBinding(3, CombinedImageSampler(1))
             }));
         descriptor.set = descriptorPool->allocateDescriptorSet(descriptor.layout);
         descriptor.set->update(0, transforms);

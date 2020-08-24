@@ -8,7 +8,7 @@ class NormalMapping : public GraphicsApp
 {
     struct Constants
     {
-        VkBool32 showNormals;
+        VkBool32 showNormals = false;
     };
 
     std::unique_ptr<quadric::Torus> torus;
@@ -19,7 +19,7 @@ class NormalMapping : public GraphicsApp
     DescriptorSet bumpDescriptor;
     DescriptorSet fillDescriptor;
 
-    Constants constants = {false};
+    Constants constants;
 
 public:
     explicit NormalMapping(const AppEntry& entry):
@@ -128,22 +128,25 @@ public:
 
     void setupDescriptorSets()
     {
+        using namespace magma::bindings;
+        using namespace magma::descriptors;
+        // Bump shader
         bumpDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                magma::bindings::VertexFragmentStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(1, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(2, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(3, magma::descriptors::CombinedImageSampler(1))
+                VertexFragmentStageBinding(0, DynamicUniformBuffer(1)),
+                FragmentStageBinding(1, UniformBuffer(1)),
+                FragmentStageBinding(2, UniformBuffer(1)),
+                FragmentStageBinding(3, CombinedImageSampler(1))
             }));
         bumpDescriptor.set = descriptorPool->allocateDescriptorSet(bumpDescriptor.layout);
         bumpDescriptor.set->update(0, transforms);
         bumpDescriptor.set->update(1, viewProjTransforms);
         bumpDescriptor.set->update(2, lightSource);
         bumpDescriptor.set->update(3, normalMap, anisotropicClampToEdge);
-
+        // Fill shader
         fillDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                magma::bindings::VertexStageBinding(0, magma::descriptors::DynamicUniformBuffer(1))
+                VertexStageBinding(0, DynamicUniformBuffer(1))
             }));
         fillDescriptor.set = descriptorPool->allocateDescriptorSet(fillDescriptor.layout);
         fillDescriptor.set->update(0, transforms);
@@ -151,11 +154,8 @@ public:
 
     void setupGraphicsPipelines()
     {
-        std::shared_ptr<magma::Specialization> specialization(new magma::Specialization(constants,
-            {
-                magma::SpecializationEntry(0, &Constants::showNormals)
-            }
-        ));
+        auto specialization(std::make_shared<magma::Specialization>(constants,
+            magma::SpecializationEntry(0, &Constants::showNormals)));
         bumpPipeline = createCommonSpecializedPipeline(
             "transform.o", "bump.o",
             std::move(specialization),

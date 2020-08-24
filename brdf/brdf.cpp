@@ -71,7 +71,7 @@ public:
 
     virtual void updateLightSource() override
     {
-        magma::helpers::mapScoped<LightSource>(lightSource,
+        magma::helpers::mapScoped(lightSource,
             [this](auto *light)
             {   // Directional light
                 constexpr float ambientFactor = 0.4f;

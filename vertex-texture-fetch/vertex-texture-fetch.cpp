@@ -5,7 +5,7 @@ class VertexTextureFetch : public GraphicsApp
 {
     struct Constants
     {
-        VkBool32 showNormals;
+        VkBool32 showNormals = false;
     };
 
     struct SeaConstants
@@ -18,25 +18,19 @@ class VertexTextureFetch : public GraphicsApp
         float frequency;
     };
 
-    struct alignas(16) Time
-    {
-        float time;
-    };
-
     const float seaHeight = 1.f;
     const float seaChoppy = 4.f;
     const float seaSpeed = 0.8f;
     const float seaFrequency = 0.16f;
 
     std::unique_ptr<GridMesh> grid;
-    std::shared_ptr<magma::UniformBuffer<Time>> time;
     std::shared_ptr<magma::aux::ColorFramebuffer> heightMap;
     std::shared_ptr<magma::GraphicsPipeline> heightMapPipeline;
     std::shared_ptr<magma::GraphicsPipeline> vertexTextureFetchPipeline;
     DescriptorSet hmDescriptor;
     DescriptorSet vtfDescriptor;
 
-    Constants constants = {false};
+    Constants constants;
     bool wireframe = false;
 
 public:
@@ -59,7 +53,7 @@ public:
 
     virtual void render(uint32_t bufferIndex) override
     {
-        updateTime();
+        updateSysUniforms();
         updateTransforms();
         submitCommandBuffers(bufferIndex);
     }
@@ -90,17 +84,6 @@ public:
                 const rapid::matrix normalMatrix = rapid::transpose(rapid::inverse(viewProj->getView()));
                 const rapid::vector3 lightViewDir = normalMatrix * lightViewProj->getPosition();
                 lightSource->viewPosition = lightViewDir.normalized();
-            });
-    }
-
-    void updateTime()
-    {
-        magma::helpers::mapScoped<Time>(time,
-            [this](auto *data)
-            {
-                static float time = 0.0f;
-                time += timer->secondsElapsed();
-                data->time = time;
             });
     }
 
@@ -150,9 +133,7 @@ public:
                 FragmentStageBinding(0, UniformBuffer(1))
             }));
         hmDescriptor.set = descriptorPool->allocateDescriptorSet(hmDescriptor.layout);
-        if (!time)
-            time = std::make_shared<magma::UniformBuffer<Time>>(device);
-        hmDescriptor.set->update(0, time);
+        hmDescriptor.set->update(0, sysUniforms);
         // 2. Vertex texture fetch
         vtfDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {

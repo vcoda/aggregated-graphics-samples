@@ -8,7 +8,7 @@ class SelfShadowing : public GraphicsApp
 {
     struct Constants
     {
-        VkBool32 selfShadowing;
+        VkBool32 selfShadowing = false;
     };
 
     std::unique_ptr<quadric::Cube> box;
@@ -21,7 +21,7 @@ class SelfShadowing : public GraphicsApp
     DescriptorSet phongDescriptor;
     DescriptorSet fillDescriptor;
 
-    Constants constants = {false};
+    Constants constants;
 
 public:
     explicit SelfShadowing(const AppEntry& entry):
@@ -56,8 +56,6 @@ public:
             renderScene(drawCmdBuffer);
             break;
         }
-        updateTransforms();
-        updateLightSource();
         VulkanApp::onKeyDown(key, repeat, flags);
     }
 

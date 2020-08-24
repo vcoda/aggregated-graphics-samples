@@ -87,13 +87,13 @@ public:
         const rapid::matrix pitch = rapid::rotationX(radians);
         const rapid::matrix yaw = rapid::rotationY(radians);
         const rapid::matrix roll = rapid::rotationZ(radians);
-        const rapid::matrix knotRotation = pitch * yaw * roll;
+        const rapid::matrix torusRotation = pitch * yaw * roll;
         const rapid::matrix rotation = rapid::rotationY(rapid::radians(-spinX/4.f));
         const std::vector<rapid::matrix, core::aligned_allocator<rapid::matrix>> transforms = {
             objTransforms[Cube] * rotation,
             objTransforms[Teapot] * rotation,
             objTransforms[Sphere] * rotation,
-            knotRotation * objTransforms[Torus] * rotation,
+            torusRotation * objTransforms[Torus] * rotation,
             objTransforms[Ground] * rotation};
         updateObjectTransforms(transforms);
     }

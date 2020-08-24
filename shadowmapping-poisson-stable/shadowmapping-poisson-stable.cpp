@@ -14,8 +14,8 @@ class StablePoissonShadowMapping : public GraphicsApp
 
     struct alignas(16) Constants
     {
-        VkBool32 screenSpaceNoise;
-        VkBool32 showNoise;
+        VkBool32 screenSpaceNoise = true;
+        VkBool32 showNoise = false;
     };
 
     struct alignas(16) Parameters
@@ -37,7 +37,7 @@ class StablePoissonShadowMapping : public GraphicsApp
     DescriptorSet descriptor;
 
     rapid::matrix objTransforms[MaxObjects];
-    Constants constants = {true, false};
+    Constants constants;
     float radius = 10.f;
     float jitterDensity = 6.f;
 
@@ -167,8 +167,7 @@ public:
     {
         if (!parameters)
             parameters = std::make_shared<magma::UniformBuffer<Parameters>>(device);
-        magma::helpers::mapScoped<Parameters>(parameters,
-            [this](auto *parameters)
+        magma::helpers::mapScoped(parameters, [this](auto *parameters)
             {
                 parameters->screenSize = rapid::float4a(float(width), float(height), 1.f/width, 1.f/height);
                 parameters->radius = radius;
@@ -268,20 +267,23 @@ public:
     }
 
     void setupDescriptorSets()
-    {   // Shadow map shader
+    {
+        using namespace magma::bindings;
+        using namespace magma::descriptors;
+        // Shadow map shader
         smDescriptor.layout = std::make_shared<magma::DescriptorSetLayout>(device,
-            magma::bindings::VertexStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)));
+            VertexStageBinding(0, DynamicUniformBuffer(1)));
         smDescriptor.set = descriptorPool->allocateDescriptorSet(smDescriptor.layout);
         smDescriptor.set->update(0, transforms);
         // Lighting shader
         descriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                magma::bindings::VertexStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(1, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(2, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(3, magma::descriptors::DynamicUniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(4, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(5, magma::descriptors::CombinedImageSampler(1))
+                VertexStageBinding(0, DynamicUniformBuffer(1)),
+                FragmentStageBinding(1, UniformBuffer(1)),
+                FragmentStageBinding(2, UniformBuffer(1)),
+                FragmentStageBinding(3, DynamicUniformBuffer(1)),
+                FragmentStageBinding(4, UniformBuffer(1)),
+                FragmentStageBinding(5, CombinedImageSampler(1))
             }));
         descriptor.set = descriptorPool->allocateDescriptorSet(descriptor.layout);
         descriptor.set->update(0, transforms);
@@ -303,15 +305,10 @@ public:
                 smDescriptor.layout,
                 shadowMap);
         }
-
-        std::shared_ptr<magma::Specialization> specialization(new magma::Specialization(
-            this->constants,
-            {
-                magma::SpecializationEntry(0, &Constants::screenSpaceNoise),
-                magma::SpecializationEntry(1, &Constants::showNoise)
-            }
+        std::shared_ptr<magma::Specialization> specialization(new magma::Specialization(constants, {
+            {0, &Constants::screenSpaceNoise},
+            {1, &Constants::showNoise}}
         ));
-
         phongShadowPipeline = createCommonSpecializedPipeline(
             "transform.o", "phong.o",
             std::move(specialization),

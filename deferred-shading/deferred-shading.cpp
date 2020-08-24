@@ -102,14 +102,14 @@ public:
         const rapid::matrix pitch = rapid::rotationX(radians);
         const rapid::matrix yaw = rapid::rotationY(radians);
         const rapid::matrix roll = rapid::rotationZ(radians);
-        const rapid::matrix knotRotation = pitch * yaw * roll;
-        const rapid::matrix rotation = rapid::rotationY(rapid::radians(-spinX/4.f));
+        const rapid::matrix torusRotation = pitch * yaw * roll;
+        const rapid::matrix rotation = rapid::rotationY(rapid::radians(-spinX / 4.f));
         const std::vector<rapid::matrix, core::aligned_allocator<rapid::matrix>> transforms = {
             objTransforms[Cube] * rotation,
             objTransforms[Teapot] * rotation,
             objTransforms[Sphere] * rotation,
-            knotRotation * objTransforms[Torus] * rotation,
-            objTransforms[Ground] * rotation};
+            torusRotation * objTransforms[Torus] * rotation,
+            objTransforms[Ground] * rotation };
         updateObjectTransforms(transforms);
     }
 
@@ -208,12 +208,14 @@ public:
     }
 
     void setupDescriptorSets()
-    {   // 1. Depth pre-pass
+    {
+        using namespace magma::bindings;
+        using namespace magma::descriptors;
+        // 1. Depth pre-pass
         depthDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                magma::bindings::VertexFragmentStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(1, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(2, magma::descriptors::DynamicUniformBuffer(1)),
+                VertexFragmentStageBinding(0, DynamicUniformBuffer(1)),
+                FragmentStageBinding(1, UniformBuffer(1))
             }));
         depthDescriptor.set = descriptorPool->allocateDescriptorSet(depthDescriptor.layout);
         depthDescriptor.set->update(0, transforms);
@@ -221,9 +223,9 @@ public:
         // 2. G-buffer fill shader
         gbDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                magma::bindings::VertexFragmentStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(1, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(2, magma::descriptors::DynamicUniformBuffer(1)),
+                VertexFragmentStageBinding(0, DynamicUniformBuffer(1)),
+                FragmentStageBinding(1, UniformBuffer(1)),
+                FragmentStageBinding(2, DynamicUniformBuffer(1))
             }));
         gbDescriptor.set = descriptorPool->allocateDescriptorSet(gbDescriptor.layout);
         gbDescriptor.set->update(0, transforms);
@@ -232,10 +234,10 @@ public:
         // 3. G-buffer fill texture shader
         gbTexDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                magma::bindings::VertexFragmentStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(1, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(2, magma::descriptors::DynamicUniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(3, magma::descriptors::CombinedImageSampler(1))
+                VertexFragmentStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
+                FragmentStageBinding(1, UniformBuffer(1)),
+                FragmentStageBinding(2, DynamicUniformBuffer(1)),
+                FragmentStageBinding(3, CombinedImageSampler(1))
             }));
         gbTexDescriptor.set = descriptorPool->allocateDescriptorSet(gbTexDescriptor.layout);
         gbTexDescriptor.set->update(0, transforms);
@@ -245,12 +247,12 @@ public:
         // 4. Deferred shading
         dsDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                magma::bindings::VertexStageBinding(1, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(2, magma::descriptors::UniformBuffer(1)), // Light source
-                magma::bindings::FragmentStageBinding(3, magma::descriptors::CombinedImageSampler(1)), // Normal
-                magma::bindings::FragmentStageBinding(4, magma::descriptors::CombinedImageSampler(1)), // Albedo
-                magma::bindings::FragmentStageBinding(5, magma::descriptors::CombinedImageSampler(1)), // Specular
-                magma::bindings::FragmentStageBinding(6, magma::descriptors::CombinedImageSampler(1)), // Depth
+                VertexStageBinding(1, magma::descriptors::UniformBuffer(1)),
+                FragmentStageBinding(2, UniformBuffer(1)), // Light source
+                FragmentStageBinding(3, CombinedImageSampler(1)), // Normal
+                FragmentStageBinding(4, CombinedImageSampler(1)), // Albedo
+                FragmentStageBinding(5, CombinedImageSampler(1)), // Specular
+                FragmentStageBinding(6, CombinedImageSampler(1))  // Depth
             }));
         dsDescriptor.set = descriptorPool->allocateDescriptorSet(dsDescriptor.layout);
         dsDescriptor.set->update(0, viewProjTransforms);

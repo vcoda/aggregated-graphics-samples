@@ -111,6 +111,17 @@ public:
             });
     }
 
+    void updateTransforms()
+    {
+        const rapid::matrix rotation = rapid::rotationY(rapid::radians(-spinX / 4.f));
+        std::vector<rapid::matrix, core::aligned_allocator<rapid::matrix>> transforms(MaxObjects);
+        transforms[Cube] = objTransforms[Cube] * rotation,
+            transforms[Teapot] = objTransforms[Teapot] * rotation,
+            transforms[Sphere] = objTransforms[Sphere] * rotation,
+            transforms[Ground] = objTransforms[Ground];
+        updateObjectTransforms(transforms);
+    }
+
     void setupViewProjection()
     {
         viewProj = std::make_unique<LeftHandedViewProjection>();
@@ -182,17 +193,6 @@ public:
             });
     }
 
-    void updateTransforms()
-    {
-        const rapid::matrix rotation = rapid::rotationY(rapid::radians(-spinX/4.f));
-        std::vector<rapid::matrix, core::aligned_allocator<rapid::matrix>> transforms(MaxObjects);
-        transforms[Cube] = objTransforms[Cube] * rotation,
-        transforms[Teapot] = objTransforms[Teapot] * rotation,
-        transforms[Sphere] = objTransforms[Sphere] * rotation,
-        transforms[Ground] = objTransforms[Ground];
-        updateObjectTransforms(transforms);
-    }
-
     void createShadowMap()
     {
         constexpr VkFormat depthFormat = VK_FORMAT_D16_UNORM; // 16 bits of depth is enough for a tiny scene
@@ -210,20 +210,23 @@ public:
     }
 
     void setupDescriptorSets()
-    {   // Shadow map shader
+    {
+        using namespace magma::bindings;
+        using namespace magma::descriptors;
+        // Shadow map shader
         smDescriptor.layout = std::make_shared<magma::DescriptorSetLayout>(device,
-            magma::bindings::VertexStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)));
+            VertexStageBinding(0, DynamicUniformBuffer(1)));
         smDescriptor.set = descriptorPool->allocateDescriptorSet(smDescriptor.layout);
         smDescriptor.set->update(0, transforms);
         // Lighting shader
         descriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                magma::bindings::VertexStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(1, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(2, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(3, magma::descriptors::DynamicUniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(4, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(5, magma::descriptors::CombinedImageSampler(1))
+                VertexStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
+                FragmentStageBinding(1, UniformBuffer(1)),
+                FragmentStageBinding(2, UniformBuffer(1)),
+                FragmentStageBinding(3, DynamicUniformBuffer(1)),
+                FragmentStageBinding(4, UniformBuffer(1)),
+                FragmentStageBinding(5, CombinedImageSampler(1))
             }));
         descriptor.set = descriptorPool->allocateDescriptorSet(descriptor.layout);
         descriptor.set->update(0, transforms);
@@ -242,7 +245,6 @@ public:
             magma::renderstates::fillCullFrontCW, // Draw only back faces to get rid of shadow acne
             smDescriptor.layout,
             shadowMap);
-
         phongShadowPipeline = createCommonPipeline(
             "transform.o", "phong.o",
             objects[0]->getVertexInput(),

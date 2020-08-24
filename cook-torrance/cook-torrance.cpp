@@ -56,7 +56,7 @@ public:
         setupAlbedo();
         setupDirectionalLights();
         updateRoughness(roughness);
-        createMeshObjects();
+        createMesh();
         setupDescriptorSets();
         setupGraphicsPipeline();
 
@@ -189,7 +189,7 @@ public:
         lightSources = std::make_shared<magma::StorageBuffer>(cmdCopyBuf, lights, sizeof(lights));
     }
 
-    void createMeshObjects()
+    void createMesh()
     {
         teapot = std::make_unique<quadric::Teapot>(16, cmdCopyBuf);
     }

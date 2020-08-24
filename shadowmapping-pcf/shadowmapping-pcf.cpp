@@ -12,9 +12,9 @@ class PcfShadowMapping : public GraphicsApp
         MaxObjects
     };
 
-    struct alignas(16) SpecializationConstants
+    struct alignas(16) Constants
     {
-        VkBool32 filterPoisson;
+        VkBool32 filterPoisson = false;
     };
 
     std::unique_ptr<quadric::Quadric> objects[MaxObjects];
@@ -26,7 +26,7 @@ class PcfShadowMapping : public GraphicsApp
     DescriptorSet descriptor;
 
     rapid::matrix objTransforms[MaxObjects];
-    bool filterPoisson = false;
+    Constants constants;
     bool showDepthMap = false;
 
 public:
@@ -57,7 +57,7 @@ public:
         switch (key)
         {
         case AppKey::Enter:
-            filterPoisson = !filterPoisson;
+            constants.filterPoisson = !constants.filterPoisson;
             setupGraphicsPipelines();
             renderScene(drawCmdBuffer);
             break;
@@ -146,18 +146,21 @@ public:
     }
 
     void setupDescriptorSets()
-    {   // Shadow map shader
+    {
+        using namespace magma::bindings;
+        using namespace magma::descriptors;
+        // Shadow map shader
         smDescriptor.layout = std::make_shared<magma::DescriptorSetLayout>(device,
-            magma::bindings::VertexStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)));
+            VertexStageBinding(0, DynamicUniformBuffer(1)));
         smDescriptor.set = descriptorPool->allocateDescriptorSet(smDescriptor.layout);
         smDescriptor.set->update(0, transforms);
         // Lighting shader
         descriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                magma::bindings::VertexStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(1, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(2, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(3, magma::descriptors::CombinedImageSampler(1))
+                VertexStageBinding(0, DynamicUniformBuffer(1)),
+                FragmentStageBinding(1, UniformBuffer(1)),
+                FragmentStageBinding(2, UniformBuffer(1)),
+                FragmentStageBinding(3, CombinedImageSampler(1))
             }));
         descriptor.set = descriptorPool->allocateDescriptorSet(descriptor.layout);
         descriptor.set->update(0, transforms);
@@ -174,15 +177,8 @@ public:
             magma::renderstates::fillCullFrontCW, // Draw only back faces to get rid of shadow acne
             smDescriptor.layout,
             shadowMap);
-
-        SpecializationConstants constants;
-        constants.filterPoisson = filterPoisson;
-        std::shared_ptr<magma::Specialization> specialization(new magma::Specialization(constants,
-            {
-                magma::SpecializationEntry(0, &SpecializationConstants::filterPoisson)
-            }
-        ));
-
+        auto specialization(std::make_shared<magma::Specialization>(constants,
+            magma::SpecializationEntry(0, &Constants::filterPoisson)));
         pcfShadowPipeline = createCommonSpecializedPipeline(
             "transform.o", "shadow.o",
             std::move(specialization),
