@@ -37,6 +37,8 @@ protected:
         std::shared_ptr<magma::DescriptorSetLayout> setLayout, std::shared_ptr<magma::aux::DepthFramebuffer> framebuffer);
 
     std::shared_ptr<magma::GraphicsPipeline> createDepthOnlyPipeline(const char *vertexShaderFile,
+        const magma::VertexInputState& vertexInputState, std::shared_ptr<magma::DescriptorSetLayout> setLayout);
+    std::shared_ptr<magma::GraphicsPipeline> createDepthOnlyPipeline(const char *vertexShaderFile,
         const magma::VertexInputState& vertexInputState, std::shared_ptr<magma::DescriptorSetLayout> setLayout,
         std::shared_ptr<magma::aux::MultiAttachmentFramebuffer> mrtFramebuffer);
 

@@ -140,9 +140,32 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createShadowMapPipeline(co
  }
 
 std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createDepthOnlyPipeline(const char *vertexShaderFile,
+    const magma::VertexInputState& vertexInputState, std::shared_ptr<magma::DescriptorSetLayout> setLayout)
+{
+    auto pipelineLayout = std::make_shared<magma::PipelineLayout>(
+         std::move(setLayout));
+    return std::make_shared<magma::GraphicsPipeline>(device,
+        std::vector<magma::PipelineShaderStage>{
+            loadShaderStage(vertexShaderFile)
+        }, vertexInputState,
+        magma::renderstates::triangleList,
+        magma::TesselationState(),
+        magma::ViewportState(0.f, 0.f, msaaFramebuffer->getExtent()),
+        magma::renderstates::fillCullBackCW,
+        msaaFramebuffer->getMultisampleState(),
+        magma::renderstates::depthLessOrEqual,
+        magma::renderstates::dontWriteRgba,
+        std::initializer_list<VkDynamicState>{},
+        std::move(pipelineLayout),
+        msaaFramebuffer->getRenderPass(), 0, // subpass
+        pipelineCache,
+        nullptr, nullptr, 0);
+}
+
+std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createDepthOnlyPipeline(const char *vertexShaderFile,
     const magma::VertexInputState& vertexInputState, std::shared_ptr<magma::DescriptorSetLayout> setLayout,
     std::shared_ptr<magma::aux::MultiAttachmentFramebuffer> mrtFramebuffer)
- {
+{
      auto pipelineLayout = std::make_shared<magma::PipelineLayout>(
          std::move(setLayout));
      return std::make_shared<magma::GraphicsPipeline>(device,
@@ -162,7 +185,7 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createDepthOnlyPipeline(co
         0, // subpass
         pipelineCache,
         nullptr, nullptr, 0);
- }
+}
 
 std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createCommonPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
         const magma::VertexInputState& vertexInputState, std::shared_ptr<magma::DescriptorSetLayout> setLayout)
