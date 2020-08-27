@@ -11,12 +11,18 @@ class EdgeDetection : public GraphicsApp
         MaxObjects
     };
 
+    struct Constants
+    {
+        VkBool32 sobelFilter = true;
+    };
+
     std::unique_ptr<quadric::Quadric> objects[MaxObjects];
     std::shared_ptr<magma::GraphicsPipeline> depthPipeline;
     std::shared_ptr<magma::aux::DepthFramebuffer> depthFramebuffer;
     DescriptorSet descriptor;
 
     rapid::matrix objTransforms[MaxObjects];
+    Constants constants;
 
 public:
     explicit EdgeDetection(const AppEntry& entry):
@@ -39,6 +45,19 @@ public:
         updateTransforms();
         submitCommandBuffers(bufferIndex);
         sleep(2); // Cap fps
+    }
+
+    virtual void onKeyDown(char key, int repeat, uint32_t flags) override
+    {
+        switch (key)
+        {
+        case AppKey::Space:
+            constants.sobelFilter = !constants.sobelFilter;
+            setupGraphicsPipelines();
+            renderScene(drawCmdBuffer);
+            break;
+        }
+        VulkanApp::onKeyDown(key, repeat, flags);
     }
 
     void setupViewProjection()
@@ -104,6 +123,10 @@ public:
             objects[0]->getVertexInput(),
             descriptor.layout,
             depthFramebuffer);
+        auto specialization(std::make_shared<magma::Specialization>(constants,
+            magma::SpecializationEntry(0, &Constants::sobelFilter)));
+        bltRect = std::make_unique<magma::aux::BlitRectangle>(renderPass,
+            loadShader("edgeDetect.o"), std::move(specialization));
     }
 
     void renderScene(std::shared_ptr<magma::CommandBuffer> cmdBuffer)
@@ -139,8 +162,6 @@ public:
     {
         cmdBuffer->beginRenderPass(msaaFramebuffer->getRenderPass(), msaaFramebuffer->getFramebuffer());
         {
-            if (!bltRect)
-                bltRect = std::make_unique<magma::aux::BlitRectangle>(renderPass, loadShader("edgeDetect.o"));
             bltRect->blit(cmdBuffer,
                 depthFramebuffer->getDepthView(),
                 VK_FILTER_NEAREST,
