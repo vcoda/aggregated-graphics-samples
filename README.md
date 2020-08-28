@@ -1,6 +1,11 @@
 # aggregated-graphics-samples
 A collection of exemplary graphics samples based on Magma and Vulkan API
 
+### [Gamma correction](srgb/)
+<img src="./screenshots/sRGB.jpg" height="144x" align="left">
+
+A well calibrated computer monitor does not use the linear RGB color space, but instead use the sRGB color space. The non-linear operation that the display applies to the signal is called gamma decode or gamma expansion (see [Gamma and Linear Spaces](http://www.codinglabs.net/article_gamma_vs_linear.aspx)). Rendering pipeline should take this into account when generating physically plausible images. First, you have to feed BRDF with linear color data in order to compensate gamma decode on your monitor. Second, you have to gamma correct final result before output. The sRGB color space roughly corresponds to 2.2 or 2.4 gamma power, so we may simply use **pow**(color, 1/2.2) to compensate it. This is a cheap approximation of gamma curve, but exact conversion is more complex (see [EXT_texture_sRGB](https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_texture_sRGB.txt) extension for precise encode/decode routines). This demo shows two spheres shaded using Phong BRDF, but left one is shaded in non-linear color space and right one is shaded in linear color space with gamma correction before output. Notice the difference in diffuse lighting. The right sphere lit more physically plausible, to prove this compare it with the [Moon](http://beautifulpixels.blogspot.com/2009/10/gamma-correct-lighting-on-moon.html) photograph.
+
 ### [BRDF](brdf/)
 <img src="./screenshots/brdf.jpg" height="144x" align="left">
 
