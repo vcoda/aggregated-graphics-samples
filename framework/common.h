@@ -24,7 +24,10 @@ struct alignas(16) ViewProjTransforms
 
 struct alignas(16) LightSource
 {
-    rapid::vector viewPosition;
+    union {
+        rapid::vector viewPosition;
+        rapid::vector viewDirection;
+    };
     LinearColor ambient;
     LinearColor diffuse;
     LinearColor specular;
