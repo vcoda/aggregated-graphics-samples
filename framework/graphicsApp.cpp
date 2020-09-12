@@ -296,6 +296,32 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createFullscreenPipeline(c
         nullptr, nullptr, 0);
 }
 
+std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createFullscreenPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
+    std::shared_ptr<magma::Specialization> specialization, std::shared_ptr<magma::DescriptorSetLayout> setLayout,
+    std::shared_ptr<magma::Framebuffer> framebuffer)
+{
+    std::shared_ptr<magma::PipelineLayout> pipelineLayout;
+    if (setLayout)
+        pipelineLayout = std::make_shared<magma::PipelineLayout>(std::move(setLayout));
+    return std::make_shared<magma::GraphicsPipeline>(device,
+        std::vector<magma::PipelineShaderStage>{
+            loadShaderStage(vertexShaderFile),
+            loadShaderStage(fragmentShaderFile, std::move(specialization))
+        }, magma::renderstates::nullVertexInput,
+        magma::renderstates::triangleStrip,
+        magma::TesselationState(),
+        magma::ViewportState(0.f, 0.f, framebuffer->getExtent()),
+        magma::renderstates::fillCullBackCW,
+        magma::renderstates::dontMultisample,
+        magma::renderstates::depthAlwaysDontWrite,
+        magma::renderstates::dontBlendRgba,
+        std::initializer_list<VkDynamicState>{},
+        std::move(pipelineLayout),
+        renderPass, 0, // subpass
+        pipelineCache,
+        nullptr, nullptr, 0);
+}
+
 void GraphicsApp::updateViewProjTransforms()
 {
     viewProj->updateView();

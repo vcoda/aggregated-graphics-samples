@@ -133,6 +133,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "srgb", "srgb\srgb.vcxproj",
 		{67B01ECD-2613-4FA0-84F7-87F5BCF40EB1} = {67B01ECD-2613-4FA0-84F7-87F5BCF40EB1}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "blur-gaussian", "blur-gaussian\blur-gaussian.vcxproj", "{709912CF-51E5-4AD2-85AE-A7D70B4C6495}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8D9D4A3E-439A-4210-8879-259B20D992CA} = {8D9D4A3E-439A-4210-8879-259B20D992CA}
+		{67B01ECD-2613-4FA0-84F7-87F5BCF40EB1} = {67B01ECD-2613-4FA0-84F7-87F5BCF40EB1}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -301,6 +307,14 @@ Global
 		{E8FAC55E-ACDF-497D-B8F9-A85599BBEEA6}.Release|x64.Build.0 = Release|x64
 		{E8FAC55E-ACDF-497D-B8F9-A85599BBEEA6}.Release|x86.ActiveCfg = Release|Win32
 		{E8FAC55E-ACDF-497D-B8F9-A85599BBEEA6}.Release|x86.Build.0 = Release|Win32
+		{709912CF-51E5-4AD2-85AE-A7D70B4C6495}.Debug|x64.ActiveCfg = Debug|x64
+		{709912CF-51E5-4AD2-85AE-A7D70B4C6495}.Debug|x64.Build.0 = Debug|x64
+		{709912CF-51E5-4AD2-85AE-A7D70B4C6495}.Debug|x86.ActiveCfg = Debug|Win32
+		{709912CF-51E5-4AD2-85AE-A7D70B4C6495}.Debug|x86.Build.0 = Debug|Win32
+		{709912CF-51E5-4AD2-85AE-A7D70B4C6495}.Release|x64.ActiveCfg = Release|x64
+		{709912CF-51E5-4AD2-85AE-A7D70B4C6495}.Release|x64.Build.0 = Release|x64
+		{709912CF-51E5-4AD2-85AE-A7D70B4C6495}.Release|x86.ActiveCfg = Release|Win32
+		{709912CF-51E5-4AD2-85AE-A7D70B4C6495}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

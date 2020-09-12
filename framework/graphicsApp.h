@@ -56,6 +56,9 @@ protected:
     std::shared_ptr<magma::GraphicsPipeline> createFullscreenPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
         std::shared_ptr<magma::Specialization> specialization, std::shared_ptr<magma::DescriptorSetLayout> setLayout,
         std::shared_ptr<magma::aux::Framebuffer> framebuffer);
+    std::shared_ptr<magma::GraphicsPipeline> createFullscreenPipeline(const char *vertexShaderFile, const char *fragmentShaderFile,
+        std::shared_ptr<magma::Specialization> specialization, std::shared_ptr<magma::DescriptorSetLayout> setLayout,
+        std::shared_ptr<magma::Framebuffer> framebuffer);
 
     void updateSysUniforms();
     void updateViewProjTransforms();
