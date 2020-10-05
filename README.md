@@ -89,6 +89,11 @@ Vertex texture fetch was first instroduced by NVIDIA with [Shader Model 3.0](htt
 
 This demo shows two useful applications of a geometry shader. First, it allows to draw wireframe meshes without using line rasterization primitive. Instead, geometry shader is inserted between vertex and fragment stages to supply additional barycentric attribute for each triangle's vertex. Interpolated barycentric values are used to calculate distance from current fragment to the triangle edge and use it as color alpha in normal blending. In this way we can render mesh in wireframe mode with superior quality without MSAA enabled. Second, geometry shader can be utilized to visualize normals and tangents. For this, geometry shader accepts triangle as input primitive but outputs line strip primitive. For each triangle we consider only the first vertex. Simply adding normal vector to vertex's coordinate, we can define endpoint of the line. In this demo vertex buffer doesn't provide tangent vectors, so I computed them directly in the geometry shader using input positions and texture coordinates.
 
+### [Ping-pong blur](blur-ping-pong/)
+<img src="./screenshots/blur-ping-pong.jpg" height="140px" align="left">
+
+This demo implements old ping-pong technique for texture blurring. The key idea is to utilize cheap bilinear texture filtering to average four texels. First, we render to "back" framebuffer, sampling input texture with negative half texel offset. Then we use the result image as input for render to "front" framebuffer sampling input texture with positive half texel offset. This process is known as the **ping pong approach**. Continuously swapping between two passes a dozen times results in blurry image. The problem with this technique is that modern hardware hate any changes to render targets. Tile-based deferred rasterizers (in mobile devices) lose a huge amount of performance when you have to read from an image you just wrote to. I implemented this technique solely for historical purposes - it's better to avoid ping-ponging on modern graphics hardware.
+
 ### [Gaussian blur](blur-gaussian/)
 <img src="./screenshots/blur-gaussian.jpg" height="140px" align="left">
 
