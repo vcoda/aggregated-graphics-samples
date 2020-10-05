@@ -279,7 +279,7 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createFullscreenPipeline(c
         pipelineLayout = std::make_shared<magma::PipelineLayout>(std::move(setLayout));
     return std::make_shared<magma::GraphicsPipeline>(device,
         std::vector<magma::PipelineShaderStage>{
-            loadShaderStage(vertexShaderFile),
+            loadShaderStage(vertexShaderFile, std::move(specialization)),
             loadShaderStage(fragmentShaderFile, std::move(specialization))
         }, magma::renderstates::nullVertexInput,
         magma::renderstates::triangleStrip,
