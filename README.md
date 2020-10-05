@@ -89,6 +89,12 @@ Vertex texture fetch was first instroduced by NVIDIA with [Shader Model 3.0](htt
 
 This demo shows two useful applications of a geometry shader. First, it allows to draw wireframe meshes without using line rasterization primitive. Instead, geometry shader is inserted between vertex and fragment stages to supply additional barycentric attribute for each triangle's vertex. Interpolated barycentric values are used to calculate distance from current fragment to the triangle edge and use it as color alpha in normal blending. In this way we can render mesh in wireframe mode with superior quality without MSAA enabled. Second, geometry shader can be utilized to visualize normals and tangents. For this, geometry shader accepts triangle as input primitive but outputs line strip primitive. For each triangle we consider only the first vertex. Simply adding normal vector to vertex's coordinate, we can define endpoint of the line. In this demo vertex buffer doesn't provide tangent vectors, so I computed them directly in the geometry shader using input positions and texture coordinates.
 
+### [Gaussian blur](blur-gaussian/)
+<img src="./screenshots/blur-gaussian.jpg" height="140px" align="left">
+
+Gaussian blur is a widely used technique in the domain of computer graphics and many rendering techniques rely on it in order to produce convincing photorealistic effects.
+The image space Gaussian filter is an NxN-tap convolution filter that weights the pixels inside of its footprint based on the [Gaussian function](https://en.wikipedia.org/wiki/Normal_distribution). While using two-dimensional filter kernel in fragment shader is straitforward, it is inefficient due to enormous number of texture fetched required to blur whole image. Fortunately, the 2-dimensional Gaussian function can be calculated by multiplying two 1-dimensional Gaussian function. That means that we can separate our Gaussian filter into a horizontal blur pass and the vertical blur pass, still getting the accurate results. In this demo I precomputed Gaussian weights, so fragment shader became a simple cycle of weighted texture fetches with final normalization.
+
 ### [Edge detection](edge-detection/)
 <img src="./screenshots/edge-detection.jpg" height="140px" align="left">
 
