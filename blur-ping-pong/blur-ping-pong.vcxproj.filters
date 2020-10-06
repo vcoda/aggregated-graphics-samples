@@ -29,5 +29,8 @@
     <CustomBuild Include="shaders\quad.vert">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+	<CustomBuild Include="shaders\quadoff.vert">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

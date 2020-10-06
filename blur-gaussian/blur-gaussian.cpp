@@ -102,7 +102,7 @@ public:
         // 1. Horizontal pass
         horzDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                FragmentStageBinding(0, CombinedImageSampler(1)),
+                VertexFragmentStageBinding(0, CombinedImageSampler(1)),
                 FragmentStageBinding(1, StorageBuffer(1)),
             }));
         horzDescriptor.set = descriptorPool->allocateDescriptorSet(horzDescriptor.layout);
@@ -111,7 +111,7 @@ public:
         // 2. Vertical pass
         vertDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                FragmentStageBinding(0, CombinedImageSampler(1)),
+                VertexFragmentStageBinding(0, CombinedImageSampler(1)),
                 FragmentStageBinding(1, StorageBuffer(1)),
             }));
         vertDescriptor.set = descriptorPool->allocateDescriptorSet(vertDescriptor.layout);
@@ -127,11 +127,11 @@ public:
         Constants constants;
         constants.horzPass = VK_TRUE;
         auto specialization = std::make_shared<magma::Specialization>(constants, entry);
-        horzPassPipeline = createFullscreenPipeline("quad.o", "blur.o", std::move(specialization), horzDescriptor.layout, tempFramebuffer);
+        horzPassPipeline = createFullscreenPipeline("quadoff.o", "blur.o", std::move(specialization), horzDescriptor.layout, tempFramebuffer);
         // 2. Vertical pass
         constants.horzPass = VK_FALSE;
         specialization = std::make_shared<magma::Specialization>(constants, entry);
-        vertPassPipeline = createFullscreenPipeline("quad.o", "blur.o", std::move(specialization), vertDescriptor.layout, framebuffers[0]);
+        vertPassPipeline = createFullscreenPipeline("quadoff.o", "blur.o", std::move(specialization), vertDescriptor.layout, framebuffers[0]);
     }
 
     void renderScene(uint32_t bufferIndex)
@@ -150,8 +150,8 @@ public:
     {
         if (blurImage)
             cmdBuffer->beginRenderPass(inputFramebuffer->getRenderPass(), inputFramebuffer->getFramebuffer());
-        else
-            cmdBuffer->beginRenderPass(renderPass, framebuffers[bufferIndex]); // Draw to swapchain
+        else // Draw to swapchain
+            cmdBuffer->beginRenderPass(renderPass, framebuffers[bufferIndex]);
         {
             cmdBuffer->bindPipeline(checkerboardPipeline);
             cmdBuffer->draw(4, 0);

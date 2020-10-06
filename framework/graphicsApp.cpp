@@ -203,7 +203,7 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createCommonSpecializedPip
          std::move(setLayout));
     return std::make_shared<magma::GraphicsPipeline>(device,
         std::vector<magma::PipelineShaderStage>{
-            loadShaderStage(vertexShaderFile),
+            loadShaderStage(vertexShaderFile, specialization),
             loadShaderStage(fragmentShaderFile, std::move(specialization))
         }, vertexInputState,
         magma::renderstates::triangleList,
@@ -279,7 +279,7 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createFullscreenPipeline(c
         pipelineLayout = std::make_shared<magma::PipelineLayout>(std::move(setLayout));
     return std::make_shared<magma::GraphicsPipeline>(device,
         std::vector<magma::PipelineShaderStage>{
-            loadShaderStage(vertexShaderFile, std::move(specialization)),
+            loadShaderStage(vertexShaderFile, specialization),
             loadShaderStage(fragmentShaderFile, std::move(specialization))
         }, magma::renderstates::nullVertexInput,
         magma::renderstates::triangleStrip,
@@ -305,7 +305,7 @@ std::shared_ptr<magma::GraphicsPipeline> GraphicsApp::createFullscreenPipeline(c
         pipelineLayout = std::make_shared<magma::PipelineLayout>(std::move(setLayout));
     return std::make_shared<magma::GraphicsPipeline>(device,
         std::vector<magma::PipelineShaderStage>{
-            loadShaderStage(vertexShaderFile),
+            loadShaderStage(vertexShaderFile, specialization),
             loadShaderStage(fragmentShaderFile, std::move(specialization))
         }, magma::renderstates::nullVertexInput,
         magma::renderstates::triangleStrip,

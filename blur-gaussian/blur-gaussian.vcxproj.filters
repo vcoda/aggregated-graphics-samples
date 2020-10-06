@@ -24,6 +24,9 @@
     <CustomBuild Include="shaders\blur.frag">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="shaders\quadoff.vert">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="blur-gaussian.cpp">

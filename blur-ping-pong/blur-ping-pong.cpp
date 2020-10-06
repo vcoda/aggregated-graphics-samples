@@ -61,7 +61,7 @@ public:
         const Constants constant = {MAGMA_BOOLEAN(ping)};
         const magma::SpecializationEntry entry(0, &Constants::ping);
         auto specialization = std::make_shared<magma::Specialization>(constant, entry);
-        pass.pipeline = createFullscreenPipeline("quad.o", "bilerp.o", std::move(specialization), std::move(layout), pass.framebuffer);
+        pass.pipeline = createFullscreenPipeline("quadoff.o", "bilerp.o", std::move(specialization), std::move(layout), pass.framebuffer);
         return pass;
     }
 
