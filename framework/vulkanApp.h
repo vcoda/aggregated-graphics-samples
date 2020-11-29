@@ -21,7 +21,7 @@ class VulkanApp : public NativeApp
 {
 public:
     VulkanApp(const AppEntry& entry, const core::tstring& caption,
-        uint32_t width, uint32_t height, bool sRGB);
+        uint32_t width, uint32_t height, bool sRGB, bool clearOp);
     ~VulkanApp();
     virtual void render(uint32_t bufferIndex) = 0;
     virtual void onIdle() override;
@@ -68,4 +68,5 @@ protected:
 
     
     bool sRGB;
+	bool clearOp;
 };

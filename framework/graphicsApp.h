@@ -18,7 +18,7 @@ public:
 
 public:
     GraphicsApp(const AppEntry& entry, const core::tstring& caption,
-        uint32_t width, uint32_t height, bool sRGB);
+        uint32_t width, uint32_t height, bool sRGB, bool clearOp = false);
     virtual void onMouseMove(int x, int y) override;
     virtual void onMouseLButton(bool down, int x, int y) override;
 

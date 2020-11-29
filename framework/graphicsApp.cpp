@@ -2,8 +2,8 @@
 #include "graphicsApp.h"
 #include "utilities.h"
 
-GraphicsApp::GraphicsApp(const AppEntry& entry, const core::tstring& caption, uint32_t width, uint32_t height, bool sRGB):
-    VulkanApp(entry, caption, width, height, sRGB)
+GraphicsApp::GraphicsApp(const AppEntry& entry, const core::tstring& caption, uint32_t width, uint32_t height, bool sRGB, bool clearOp /* false */):
+    VulkanApp(entry, caption, width, height, sRGB, clearOp)
 {
     initialize();
     try {
@@ -397,6 +397,7 @@ void GraphicsApp::updateLightSource()
 
 void GraphicsApp::blit(std::shared_ptr<const magma::ImageView> imageView, uint32_t bufferIndex)
 {
+	MAGMA_ASSERT(!clearOp);
     std::shared_ptr<magma::CommandBuffer> cmdBuffer = commandBuffers[bufferIndex];
     cmdBuffer->begin();
     cmdBuffer->beginRenderPass(renderPass, framebuffers[bufferIndex]);

@@ -1,9 +1,10 @@
 #include "vulkanApp.h"
 #include "utilities.h"
 
-VulkanApp::VulkanApp(const AppEntry& entry, const core::tstring& caption, uint32_t width, uint32_t height, bool sRGB):
+VulkanApp::VulkanApp(const AppEntry& entry, const core::tstring& caption, uint32_t width, uint32_t height, bool sRGB, bool clearOp):
     NativeApp(entry, caption, width, height),
-    sRGB(sRGB)
+    sRGB(sRGB),
+	clearOp(clearOp)
 {
 }
 
@@ -200,7 +201,7 @@ void VulkanApp::createRenderPass()
 {
     const std::vector<VkSurfaceFormatKHR> surfaceFormats = physicalDevice->getSurfaceFormats(surface);
     const magma::AttachmentDescription colorAttachment(surfaceFormats[0].format, 1,
-        magma::op::clearStore, // Color clear, store
+        clearOp ? magma::op::clearStore : magma::op::store,
         magma::op::dontCare,
         VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
