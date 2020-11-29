@@ -115,7 +115,8 @@ public:
     {
         constexpr VkFormat format = VK_FORMAT_R16_SFLOAT;
         constexpr VkExtent2D extent{2048, 2048};
-        heightMap = std::make_shared<magma::aux::ColorFramebuffer>(device, format, VK_FORMAT_UNDEFINED, extent, false);
+		constexpr bool clearOp = false;
+        heightMap = std::make_shared<magma::aux::ColorFramebuffer>(device, format, extent, clearOp);
     }
 
     void createGridMesh()
