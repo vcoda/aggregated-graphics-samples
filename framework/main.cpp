@@ -37,9 +37,11 @@ int main(int argc, char *argv[])
     catch (const magma::exception::ErrorResult& exc)
     {
         std::ostringstream msg;
-        msg << exc.location().file_name() << "(" << exc.location().line() << "):" << std::endl
-            << std::endl
-            << magma::helpers::stringize(exc.error()) << std::endl
+        if (exc.location().file_name() != nullptr)
+        {
+            msg << exc.location().file_name() << "(" << exc.location().line() << "):" << std::endl << std::endl;
+        }
+        msg << magma::helpers::stringize(exc.error()) << std::endl
             << exc.what();
         error(msg.str(), "Vulkan");
     }
