@@ -205,19 +205,19 @@ public:
                 VertexFragmentStageBinding(5, CombinedImageSampler(1))
             }));
         displacementDescriptor.set = descriptorPool->allocateDescriptorSet(displacementDescriptor.layout);
-        displacementDescriptor.set->update(0, transforms);
-        displacementDescriptor.set->update(1, viewProjTransforms);
-        displacementDescriptor.set->update(2, lightSource);
-        displacementDescriptor.set->update(3, material);
-        displacementDescriptor.set->update(4, parameters);
-        displacementDescriptor.set->update(5, displacementMap, anisotropicClampToEdge);
+        displacementDescriptor.set->writeDescriptor(0, transforms);
+        displacementDescriptor.set->writeDescriptor(1, viewProjTransforms);
+        displacementDescriptor.set->writeDescriptor(2, lightSource);
+        displacementDescriptor.set->writeDescriptor(3, material);
+        displacementDescriptor.set->writeDescriptor(4, parameters);
+        displacementDescriptor.set->writeDescriptor(5, displacementMap, anisotropicClampToEdge);
         // Fill shader
         fillDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
                 VertexStageBinding(0, DynamicUniformBuffer(1))
             }));
         fillDescriptor.set = descriptorPool->allocateDescriptorSet(fillDescriptor.layout);
-        fillDescriptor.set->update(0, transforms);
+        fillDescriptor.set->writeDescriptor(0, transforms);
     }
 
     void setupGraphicsPipelines()

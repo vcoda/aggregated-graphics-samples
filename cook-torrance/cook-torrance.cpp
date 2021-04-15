@@ -208,12 +208,12 @@ public:
                 FragmentStageBinding(5, DynamicUniformBuffer(1))
             }));
         descriptor.set = descriptorPool->allocateDescriptorSet(descriptor.layout);
-        descriptor.set->update(0, transforms);
-        descriptor.set->update(1, viewProjTransforms);
-        descriptor.set->update(2, lightSources);
-        descriptor.set->update(3, roughnessUniform);
-        descriptor.set->update(4, refractiveIndices);
-        descriptor.set->update(5, albedoColors);
+        descriptor.set->writeDescriptor(0, transforms);
+        descriptor.set->writeDescriptor(1, viewProjTransforms);
+        descriptor.set->writeDescriptor(2, lightSources);
+        descriptor.set->writeDescriptor(3, roughnessUniform);
+        descriptor.set->writeDescriptor(4, refractiveIndices);
+        descriptor.set->writeDescriptor(5, albedoColors);
     }
 
     void setupGraphicsPipeline()

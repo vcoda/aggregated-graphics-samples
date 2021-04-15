@@ -176,7 +176,7 @@ public:
                 FragmentStageBinding(0, UniformBuffer(1))
             }));
         hmDescriptor.set = descriptorPool->allocateDescriptorSet(hmDescriptor.layout);
-        hmDescriptor.set->update(0, sysUniforms);
+        hmDescriptor.set->writeDescriptor(0, sysUniforms);
         // 2. Seascape pass
         vtfDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
@@ -189,13 +189,13 @@ public:
                 FragmentStageBinding(6, CombinedImageSampler(1)) // envmap
             }));
         vtfDescriptor.set = descriptorPool->allocateDescriptorSet(vtfDescriptor.layout);
-        vtfDescriptor.set->update(0, transforms);
-        vtfDescriptor.set->update(1, viewProjTransforms);
-        vtfDescriptor.set->update(2, lightSource);
-        vtfDescriptor.set->update(3, material);
-        vtfDescriptor.set->update(4, seabed);
-        vtfDescriptor.set->update(5, heightMap->getColorView(), nearestClampToEdge);
-        vtfDescriptor.set->update(6, envMap, anisotropicClampToEdge);
+        vtfDescriptor.set->writeDescriptor(0, transforms);
+        vtfDescriptor.set->writeDescriptor(1, viewProjTransforms);
+        vtfDescriptor.set->writeDescriptor(2, lightSource);
+        vtfDescriptor.set->writeDescriptor(3, material);
+        vtfDescriptor.set->writeDescriptor(4, seabed);
+        vtfDescriptor.set->writeDescriptor(5, heightMap->getColorView(), nearestClampToEdge);
+        vtfDescriptor.set->writeDescriptor(6, envMap, anisotropicClampToEdge);
     }
 
     std::shared_ptr<magma::Specialization> createSpecialization()

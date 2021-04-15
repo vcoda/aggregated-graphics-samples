@@ -71,8 +71,8 @@ public:
             magma::bindings::VertexFragmentStageBinding(0, magma::descriptors::CombinedImageSampler(1)));
         ping = createPass(layout, true);
         pong = createPass(layout, false);
-        ping.set->update(0, pong.framebuffer->getColorView(), bilinearRepeat); // Use hardware bilinear filtering
-        pong.set->update(0, ping.framebuffer->getColorView(), bilinearRepeat); // Use hardware bilinear filtering
+        ping.set->writeDescriptor(0, pong.framebuffer->getColorView(), bilinearRepeat); // Use hardware bilinear filtering
+        pong.set->writeDescriptor(0, ping.framebuffer->getColorView(), bilinearRepeat); // Use hardware bilinear filtering
     }
 
     void setupGraphicsPipelines()

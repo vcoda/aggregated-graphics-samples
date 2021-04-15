@@ -274,7 +274,7 @@ public:
         smDescriptor.layout = std::make_shared<magma::DescriptorSetLayout>(device,
             VertexStageBinding(0, DynamicUniformBuffer(1)));
         smDescriptor.set = descriptorPool->allocateDescriptorSet(smDescriptor.layout);
-        smDescriptor.set->update(0, transforms);
+        smDescriptor.set->writeDescriptor(0, transforms);
         // Lighting shader
         descriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
@@ -286,12 +286,12 @@ public:
                 FragmentStageBinding(5, CombinedImageSampler(1))
             }));
         descriptor.set = descriptorPool->allocateDescriptorSet(descriptor.layout);
-        descriptor.set->update(0, transforms);
-        descriptor.set->update(1, viewProjTransforms);
-        descriptor.set->update(2, lightSource);
-        descriptor.set->update(3, materials);
-        descriptor.set->update(4, parameters);
-        descriptor.set->update(5, shadowMap->getDepthView(), shadowSampler);
+        descriptor.set->writeDescriptor(0, transforms);
+        descriptor.set->writeDescriptor(1, viewProjTransforms);
+        descriptor.set->writeDescriptor(2, lightSource);
+        descriptor.set->writeDescriptor(3, materials);
+        descriptor.set->writeDescriptor(4, parameters);
+        descriptor.set->writeDescriptor(5, shadowMap->getDepthView(), shadowSampler);
     }
 
     void setupGraphicsPipelines()

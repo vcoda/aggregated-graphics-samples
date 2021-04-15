@@ -218,8 +218,8 @@ public:
                 FragmentStageBinding(1, UniformBuffer(1))
             }));
         depthDescriptor.set = descriptorPool->allocateDescriptorSet(depthDescriptor.layout);
-        depthDescriptor.set->update(0, transforms);
-        depthDescriptor.set->update(1, viewProjTransforms);
+        depthDescriptor.set->writeDescriptor(0, transforms);
+        depthDescriptor.set->writeDescriptor(1, viewProjTransforms);
         // 2. G-buffer fill shader
         gbDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
@@ -228,22 +228,22 @@ public:
                 FragmentStageBinding(2, DynamicUniformBuffer(1))
             }));
         gbDescriptor.set = descriptorPool->allocateDescriptorSet(gbDescriptor.layout);
-        gbDescriptor.set->update(0, transforms);
-        gbDescriptor.set->update(1, viewProjTransforms);
-        gbDescriptor.set->update(2, materials);
+        gbDescriptor.set->writeDescriptor(0, transforms);
+        gbDescriptor.set->writeDescriptor(1, viewProjTransforms);
+        gbDescriptor.set->writeDescriptor(2, materials);
         // 3. G-buffer fill texture shader
         gbTexDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                VertexFragmentStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
+                VertexFragmentStageBinding(0, DynamicUniformBuffer(1)),
                 FragmentStageBinding(1, UniformBuffer(1)),
                 FragmentStageBinding(2, DynamicUniformBuffer(1)),
                 FragmentStageBinding(3, CombinedImageSampler(1))
             }));
         gbTexDescriptor.set = descriptorPool->allocateDescriptorSet(gbTexDescriptor.layout);
-        gbTexDescriptor.set->update(0, transforms);
-        gbTexDescriptor.set->update(1, viewProjTransforms);
-        gbTexDescriptor.set->update(2, materials);
-        gbTexDescriptor.set->update(3, normalMap, anisotropicClampToEdge);
+        gbTexDescriptor.set->writeDescriptor(0, transforms);
+        gbTexDescriptor.set->writeDescriptor(1, viewProjTransforms);
+        gbTexDescriptor.set->writeDescriptor(2, materials);
+        gbTexDescriptor.set->writeDescriptor(3, normalMap, anisotropicClampToEdge);
         // 4. Deferred shading
         dsDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
@@ -255,12 +255,12 @@ public:
                 FragmentStageBinding(6, CombinedImageSampler(1))  // Depth
             }));
         dsDescriptor.set = descriptorPool->allocateDescriptorSet(dsDescriptor.layout);
-        dsDescriptor.set->update(0, viewProjTransforms);
-        dsDescriptor.set->update(1, lightSource);
-        dsDescriptor.set->update(2, gbuffer->getAttachmentView(0), nearestClampToEdge);
-        dsDescriptor.set->update(3, gbuffer->getAttachmentView(1), nearestClampToEdge);
-        dsDescriptor.set->update(4, gbuffer->getAttachmentView(2), nearestClampToEdge);
-        dsDescriptor.set->update(5, gbuffer->getDepthStencilView(), nearestClampToEdge);
+        dsDescriptor.set->writeDescriptor(0, viewProjTransforms);
+        dsDescriptor.set->writeDescriptor(1, lightSource);
+        dsDescriptor.set->writeDescriptor(2, gbuffer->getAttachmentView(0), nearestClampToEdge);
+        dsDescriptor.set->writeDescriptor(3, gbuffer->getAttachmentView(1), nearestClampToEdge);
+        dsDescriptor.set->writeDescriptor(4, gbuffer->getAttachmentView(2), nearestClampToEdge);
+        dsDescriptor.set->writeDescriptor(5, gbuffer->getDepthStencilView(), nearestClampToEdge);
     }
 
     void setupGraphicsPipelines()

@@ -114,13 +114,13 @@ public:
                 FragmentStageBinding(1, UniformBuffer(1)),
             }));
         wireframeDescriptor.set = descriptorPool->allocateDescriptorSet(wireframeDescriptor.layout);
-        wireframeDescriptor.set->update(0, transforms);
-        wireframeDescriptor.set->update(1, wireframe);
+        wireframeDescriptor.set->writeDescriptor(0, transforms);
+        wireframeDescriptor.set->writeDescriptor(1, wireframe);
         // 2. Tangents pass
         transformDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             VertexGeometryStageBinding(0, DynamicUniformBuffer(1))));
         transformDescriptor.set = descriptorPool->allocateDescriptorSet(transformDescriptor.layout);
-        transformDescriptor.set->update(0, transforms);
+        transformDescriptor.set->writeDescriptor(0, transforms);
     }
 
     void setupGraphicsPipelines()

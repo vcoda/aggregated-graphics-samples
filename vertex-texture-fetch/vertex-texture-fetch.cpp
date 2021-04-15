@@ -134,7 +134,7 @@ public:
                 FragmentStageBinding(0, UniformBuffer(1))
             }));
         hmDescriptor.set = descriptorPool->allocateDescriptorSet(hmDescriptor.layout);
-        hmDescriptor.set->update(0, sysUniforms);
+        hmDescriptor.set->writeDescriptor(0, sysUniforms);
         // 2. Vertex texture fetch
         vtfDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
@@ -144,10 +144,10 @@ public:
                 VertexFragmentStageBinding(3, CombinedImageSampler(1))
             }));
         vtfDescriptor.set = descriptorPool->allocateDescriptorSet(vtfDescriptor.layout);
-        vtfDescriptor.set->update(0, transforms);
-        vtfDescriptor.set->update(1, viewProjTransforms);
-        vtfDescriptor.set->update(2, lightSource);
-        vtfDescriptor.set->update(3, heightMap->getColorView(), nearestClampToEdge);
+        vtfDescriptor.set->writeDescriptor(0, transforms);
+        vtfDescriptor.set->writeDescriptor(1, viewProjTransforms);
+        vtfDescriptor.set->writeDescriptor(2, lightSource);
+        vtfDescriptor.set->writeDescriptor(3, heightMap->getColorView(), nearestClampToEdge);
     }
 
     std::shared_ptr<magma::Specialization> createSpecialization()

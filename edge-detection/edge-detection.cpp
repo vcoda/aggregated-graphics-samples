@@ -113,7 +113,7 @@ public:
         descriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             VertexStageBinding(0, DynamicUniformBuffer(1))));
         descriptor.set = descriptorPool->allocateDescriptorSet(descriptor.layout);
-        descriptor.set->update(0, transforms);
+        descriptor.set->writeDescriptor(0, transforms);
     }
 
     void setupGraphicsPipelines()

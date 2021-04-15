@@ -183,30 +183,33 @@ public:
     }
 
     void setupDescriptorSets()
-    {   // 1. G-buffer fill shader
+    {
+        using namespace magma::bindings;
+        using namespace magma::descriptors;
+        // 1. G-buffer fill shader
         descriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                magma::bindings::VertexStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(1, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(2, magma::descriptors::DynamicUniformBuffer(1)),
+                VertexStageBinding(0, DynamicUniformBuffer(1)),
+                VertexFragmentStageBinding(1, UniformBuffer(1)),
+                VertexFragmentStageBinding(2, DynamicUniformBuffer(1)),
             }));
         descriptor.set = descriptorPool->allocateDescriptorSet(descriptor.layout);
-        descriptor.set->update(0, transforms);
-        descriptor.set->update(1, viewProjTransforms);
-        descriptor.set->update(2, materials);
+        descriptor.set->writeDescriptor(0, transforms);
+        descriptor.set->writeDescriptor(1, viewProjTransforms);
+        descriptor.set->writeDescriptor(2, materials);
         // 2. G-buffer fill texture shader
         texDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
-                magma::bindings::VertexFragmentStageBinding(0, magma::descriptors::DynamicUniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(1, magma::descriptors::UniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(2, magma::descriptors::DynamicUniformBuffer(1)),
-                magma::bindings::FragmentStageBinding(3, magma::descriptors::CombinedImageSampler(1))
+                magma::bindings::VertexFragmentStageBinding(0, DynamicUniformBuffer(1)),
+                magma::bindings::VertexFragmentStageBinding(1, UniformBuffer(1)),
+                magma::bindings::VertexFragmentStageBinding(2, DynamicUniformBuffer(1)),
+                magma::bindings::VertexFragmentStageBinding(3, CombinedImageSampler(1))
             }));
         texDescriptor.set = descriptorPool->allocateDescriptorSet(texDescriptor.layout);
-        texDescriptor.set->update(0, transforms);
-        texDescriptor.set->update(1, viewProjTransforms);
-        texDescriptor.set->update(2, materials);
-        texDescriptor.set->update(3, normalMap, anisotropicClampToEdge);
+        texDescriptor.set->writeDescriptor(0, transforms);
+        texDescriptor.set->writeDescriptor(1, viewProjTransforms);
+        texDescriptor.set->writeDescriptor(2, materials);
+        texDescriptor.set->writeDescriptor(3, normalMap, anisotropicClampToEdge);
     }
 
     void setupGraphicsPipelines()

@@ -137,19 +137,19 @@ public:
                 FragmentStageBinding(5, CombinedImageSampler(1))
             }));
         phongDescriptor.set = descriptorPool->allocateDescriptorSet(phongDescriptor.layout);
-        phongDescriptor.set->update(0, transforms);
-        phongDescriptor.set->update(1, viewProjTransforms);
-        phongDescriptor.set->update(2, lightSource);
-        phongDescriptor.set->update(3, diffuseMap, anisotropicClampToEdge);
-        phongDescriptor.set->update(4, normalMap, anisotropicClampToEdge);
-        phongDescriptor.set->update(5, specularMap, anisotropicClampToEdge);
+        phongDescriptor.set->writeDescriptor(0, transforms);
+        phongDescriptor.set->writeDescriptor(1, viewProjTransforms);
+        phongDescriptor.set->writeDescriptor(2, lightSource);
+        phongDescriptor.set->writeDescriptor(3, diffuseMap, anisotropicClampToEdge);
+        phongDescriptor.set->writeDescriptor(4, normalMap, anisotropicClampToEdge);
+        phongDescriptor.set->writeDescriptor(5, specularMap, anisotropicClampToEdge);
         // Fill shader
         fillDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
                 VertexStageBinding(0, DynamicUniformBuffer(1))
             }));
         fillDescriptor.set = descriptorPool->allocateDescriptorSet(fillDescriptor.layout);
-        fillDescriptor.set->update(0, transforms);
+        fillDescriptor.set->writeDescriptor(0, transforms);
     }
 
     void setupGraphicsPipelines()

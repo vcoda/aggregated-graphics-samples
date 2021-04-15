@@ -106,8 +106,8 @@ public:
                 FragmentStageBinding(1, StorageBuffer(1)),
             }));
         horzDescriptor.set = descriptorPool->allocateDescriptorSet(horzDescriptor.layout);
-        horzDescriptor.set->update(0, inputFramebuffer->getColorView(), nearestRepeat);
-        horzDescriptor.set->update(1, weightsBuffer);
+        horzDescriptor.set->writeDescriptor(0, inputFramebuffer->getColorView(), nearestRepeat);
+        horzDescriptor.set->writeDescriptor(1, weightsBuffer);
         // 2. Vertical pass
         vertDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             {
@@ -115,8 +115,8 @@ public:
                 FragmentStageBinding(1, StorageBuffer(1)),
             }));
         vertDescriptor.set = descriptorPool->allocateDescriptorSet(vertDescriptor.layout);
-        vertDescriptor.set->update(0, tempFramebuffer->getColorView(), nearestRepeat);
-        vertDescriptor.set->update(1, weightsBuffer);
+        vertDescriptor.set->writeDescriptor(0, tempFramebuffer->getColorView(), nearestRepeat);
+        vertDescriptor.set->writeDescriptor(1, weightsBuffer);
     }
 
     void setupGraphicsPipelines()

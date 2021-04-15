@@ -138,16 +138,16 @@ public:
                 FragmentStageBinding(3, CombinedImageSampler(1))
             }));
         bumpDescriptor.set = descriptorPool->allocateDescriptorSet(bumpDescriptor.layout);
-        bumpDescriptor.set->update(0, transforms);
-        bumpDescriptor.set->update(1, viewProjTransforms);
-        bumpDescriptor.set->update(2, lightSource);
-        bumpDescriptor.set->update(3, heightMap, anisotropicClampToEdge);
+        bumpDescriptor.set->writeDescriptor(0, transforms);
+        bumpDescriptor.set->writeDescriptor(1, viewProjTransforms);
+        bumpDescriptor.set->writeDescriptor(2, lightSource);
+        bumpDescriptor.set->writeDescriptor(3, heightMap, anisotropicClampToEdge);
         // Fill shader
         fillDescriptor.layout = std::shared_ptr<magma::DescriptorSetLayout>(new magma::DescriptorSetLayout(device,
             VertexStageBinding(0, DynamicUniformBuffer(1))
         ));
         fillDescriptor.set = descriptorPool->allocateDescriptorSet(fillDescriptor.layout);
-        fillDescriptor.set->update(0, transforms);
+        fillDescriptor.set->writeDescriptor(0, transforms);
     }
 
     void setupGraphicsPipelines()

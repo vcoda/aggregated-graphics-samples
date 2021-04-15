@@ -92,9 +92,9 @@ public:
                 FragmentStageBinding(2, UniformBuffer(1))
             }));
         descriptor.set = descriptorPool->allocateDescriptorSet(descriptor.layout);
-        descriptor.set->update(0, transforms);
-        descriptor.set->update(1, viewProjTransforms);
-        descriptor.set->update(2, lightSource);
+        descriptor.set->writeDescriptor(0, transforms);
+        descriptor.set->writeDescriptor(1, viewProjTransforms);
+        descriptor.set->writeDescriptor(2, lightSource);
     }
 
     void setupGraphicsPipelines()

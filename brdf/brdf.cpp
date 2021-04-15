@@ -188,11 +188,11 @@ public:
                 FragmentStageBinding(4, CombinedImageSampler(1))
             }));
         descriptor.set = descriptorPool->allocateDescriptorSet(descriptor.layout);
-        descriptor.set->update(0, transforms);
-        descriptor.set->update(1, viewProjTransforms);
-        descriptor.set->update(2, lightSource);
-        descriptor.set->update(3, materials);
-        descriptor.set->update(4, aniso, anisotropicClampToEdge);
+        descriptor.set->writeDescriptor(0, transforms);
+        descriptor.set->writeDescriptor(1, viewProjTransforms);
+        descriptor.set->writeDescriptor(2, lightSource);
+        descriptor.set->writeDescriptor(3, materials);
+        descriptor.set->writeDescriptor(4, aniso, anisotropicClampToEdge);
     }
 
     void setupGraphicsPipelines()
