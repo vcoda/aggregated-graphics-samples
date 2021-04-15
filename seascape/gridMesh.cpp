@@ -1,8 +1,6 @@
 #include "gridMesh.h"
 #include "magma/magma.h"
-#define _XM_F16C_INTRINSICS_
-#include "rapid/DirectXMath/Inc/DirectXPackedVector.h"
-using namespace DirectX::PackedVector;
+#include "rapid/rapid.h"
 
 GridMesh::GridMesh(uint16_t rows, uint16_t cols, float scale,
     std::shared_ptr<magma::CommandBuffer> cmdBuffer)
@@ -10,12 +8,12 @@ GridMesh::GridMesh(uint16_t rows, uint16_t cols, float scale,
     const float dx = scale/cols;
     const float dz = scale/rows;
     const float o = -scale * .5f;
-    const std::size_t vertexBufferSize = (rows + 1) * (cols + 1) * sizeof(XMHALF2);
+    const std::size_t vertexBufferSize = (rows + 1) * (cols + 1) * sizeof(rapid::half2);
     const std::size_t indexBufferSize = rows * (3 + cols * 2) * sizeof(uint16_t);
     std::shared_ptr<magma::SrcTransferBuffer> stagingBuffer(std::make_shared<magma::SrcTransferBuffer>(
         cmdBuffer->getDevice(), vertexBufferSize + indexBufferSize));
     void *data = stagingBuffer->getMemory()->map();
-    XMHALF2 *vert = (XMHALF2 *)data;
+    rapid::half2 *vert = (rapid::half2 *)data;
     // Setup X, Z coordinates
     float z = o;
     for (uint16_t i = 0, n = rows + 1; i < n; ++i, z += dz)
@@ -23,8 +21,8 @@ GridMesh::GridMesh(uint16_t rows, uint16_t cols, float scale,
         float x = o;
         for (uint16_t j = 0, m = cols + 1; j < m; ++j, x += dx)
         {   // Quantize floats to halves
-            vert->x = XMConvertFloatToHalf(x);
-            vert->y = XMConvertFloatToHalf(z);
+            vert->x = rapid::ftoh(x);
+            vert->y = rapid::ftoh(z);
             ++vert;
         }
     }
@@ -48,7 +46,7 @@ GridMesh::GridMesh(uint16_t rows, uint16_t cols, float scale,
     // Create vertex and index buffers
     vertexBuffer = std::make_shared<magma::VertexBuffer>(cmdBuffer,
         stagingBuffer, vertexBufferSize, 0);
-    indexBuffer = std::make_shared<magma::IndexBuffer>(cmdBuffer,
+    indexBuffer = std::make_shared<magma::IndexBuffer>(std::move(cmdBuffer),
         stagingBuffer, VK_INDEX_TYPE_UINT16, indexBufferSize, vertexBufferSize);
     stagingBuffer->getMemory()->unmap();
 }
