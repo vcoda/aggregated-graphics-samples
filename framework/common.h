@@ -11,6 +11,12 @@ struct alignas(16) Transforms
     rapid::matrix normal; // gl_NormalMatrix = transpose(inverse(gl_ModelViewMatrix))
 };
 
+struct alignas(16) RtTransforms
+{
+    rapid::matrix world;
+    rapid::matrix normal; // gl_NormalMatrix = transpose(inverse(gl_ModelViewMatrix))
+};
+
 struct alignas(16) ViewProjTransforms
 {
     rapid::matrix view;

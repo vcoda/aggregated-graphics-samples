@@ -1,0 +1,26 @@
+#version 460
+#extension GL_NV_ray_tracing : require
+#extension GL_GOOGLE_include_directive : enable
+#include "rt/ray.h"
+
+layout(set = 0, binding = 0) uniform accelerationStructureNV tlas;
+layout(set = 0, binding = 1, rgba32f) uniform image2D image;
+
+layout(location = 0) rayPayloadNV vec3 color;
+
+void main()
+{
+    float fov = radians(45.);
+    Ray ray = raycast(fov);
+    uint rayFlags = gl_RayFlagsCullBackFacingTrianglesNV | gl_RayFlagsOpaqueNV;
+    uint cullMask = 0xFF;
+    float tmin = 0.001;
+    float tmax = 3.0;
+    
+    traceNV(tlas, rayFlags, cullMask, 0, 0, 
+        0, // miss index
+        ray.origin, tmin, ray.dir, tmax,
+        0); // payload location
+
+    imageStore(image, ivec2(gl_LaunchIDNV.xy), vec4(color, 1.));
+}

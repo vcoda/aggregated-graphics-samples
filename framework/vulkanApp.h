@@ -31,6 +31,9 @@ public:
 protected:
     virtual void initialize();
     virtual void createInstance();
+    virtual void enableDeviceFeatures(VkPhysicalDeviceFeatures& features) const noexcept;
+    virtual void enableDeviceFeaturesExt(std::vector<void *>& features) const;
+    virtual void enableExtensions(std::vector<const char*>& extensionNames) const;
     virtual void createLogicalDevice();
     virtual void createSwapchain(bool vSync);
     virtual void createRenderPass();

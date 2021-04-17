@@ -88,6 +88,40 @@ void VulkanApp::createInstance()
     extensions = std::make_unique<magma::PhysicalDeviceExtensions>(physicalDevice);
 }
 
+void VulkanApp::enableDeviceFeatures(VkPhysicalDeviceFeatures& features) const noexcept
+{
+    features.fillModeNonSolid = VK_TRUE;
+    features.samplerAnisotropy = VK_TRUE;
+    features.textureCompressionBC = VK_TRUE;
+    features.occlusionQueryPrecise = VK_TRUE;
+}
+
+void VulkanApp::enableDeviceFeaturesExt(std::vector<void *>& features) const
+{
+#ifdef VK_KHR_separate_depth_stencil_layouts
+    if (extensions->KHR_separate_depth_stencil_layouts)
+    {
+        static VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures separateDepthStencilLayouts;
+        separateDepthStencilLayouts.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SEPARATE_DEPTH_STENCIL_LAYOUTS_FEATURES;
+        separateDepthStencilLayouts.pNext = nullptr;
+        separateDepthStencilLayouts.separateDepthStencilLayouts = true;
+        features.push_back(&separateDepthStencilLayouts);
+    }
+#endif // VK_KHR_separate_depth_stencil_layouts
+}
+
+void VulkanApp::enableExtensions(std::vector<const char*>& extensionNames) const
+{
+#ifdef VK_KHR_swapchain
+    if (extensions->KHR_swapchain)
+        extensionNames.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+#endif
+#ifdef VK_NV_fill_rectangle
+    if (extensions->NV_fill_rectangle)
+        extensionNames.push_back(VK_NV_FILL_RECTANGLE_EXTENSION_NAME);
+#endif
+}
+
 void VulkanApp::createLogicalDevice()
 {
     const std::vector<float> defaultQueuePriorities = {1.0f};
@@ -100,16 +134,16 @@ void VulkanApp::createLogicalDevice()
 
     // Enable some widely used features
     VkPhysicalDeviceFeatures features = {0};
-    features.fillModeNonSolid = VK_TRUE;
-    features.samplerAnisotropy = VK_TRUE;
-    features.textureCompressionBC = VK_TRUE;
-    features.occlusionQueryPrecise = VK_TRUE;
+    enableDeviceFeatures(features);
 
-    std::vector<const char*> enabledExtensions;
-    enabledExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+    std::vector<void *> extendedFeatures;
+    enableDeviceFeaturesExt(extendedFeatures);
+
+    std::vector<const char*> extensionNames;
+    enableExtensions(extensionNames);
 
     const std::vector<const char*> noLayers;
-    device = physicalDevice->createDevice(queueDescriptors, noLayers, enabledExtensions, features);
+    device = physicalDevice->createDevice(queueDescriptors, noLayers, extensionNames, features, extendedFeatures);
 }
 
 void VulkanApp::createSwapchain(bool vSync)

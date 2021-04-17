@@ -19,6 +19,9 @@
     <Filter Include="Resource Files\brdf">
       <UniqueIdentifier>{7dd56707-fa1b-4c1a-a63d-8c48d599c36c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\rt">
+      <UniqueIdentifier>{d6ee96d3-302c-4859-bef1-aaa5cae128e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h">
@@ -150,6 +153,18 @@
     <ClInclude Include="shaders\brdf\ward.h">
       <Filter>Resource Files\brdf</Filter>
     </ClInclude>
+    <ClInclude Include="rayTracingApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\rt\interpolation.h">
+      <Filter>Resource Files\rt</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders\rt\ray.h">
+      <Filter>Resource Files\rt</Filter>
+    </ClInclude>
+    <ClInclude Include="rtMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="arcball.cpp">
@@ -174,6 +189,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="textureLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rayTracingApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
