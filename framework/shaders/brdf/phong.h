@@ -5,8 +5,10 @@ vec3 phong(vec3 n, vec3 l, vec3 v,
     float shininess,
     float shadow)
 {
-    float NdL = max(dot(n, l), 0.);
     vec3 r = reflect(-l, n);
-    float RdV = max(dot(r, v), 0.);
-    return Ka * Ia + shadow * (Kdiff * NdL * Idiff) + (Kspec * pow(RdV, shininess) * Ispec);
+    float NdL = dot(n, l);
+    float RdV = dot(r, v);
+    vec3 diff = Kdiff * Idiff;
+    vec3 spec = Kspec * pow(max(RdV, 0.), shininess) * Ispec;
+    return max(NdL, 0.) * (diff + spec) * shadow + Ka * Ia;
 }

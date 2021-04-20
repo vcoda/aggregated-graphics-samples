@@ -6,7 +6,9 @@ vec3 blinnPhong(vec3 n, vec3 l, vec3 v,
     float shadow)
 {
     vec3 h = normalize(l + v);
-    float NdL = max(dot(n, l), 0.);
-    float NdH = max(dot(n, h), 0.);
-    return Ka * Ia + shadow * (Kdiff * NdL * Idiff) + (Kspec * pow(NdH, shininess) * Ispec);
+    float NdL = dot(n, l);
+    float NdH = dot(n, h);
+    vec3 diff = Kdiff * max(NdL, 0.) * Idiff;
+    vec3 spec = Kspec * pow(max(NdH, 0.), shininess) * Ispec;
+    return (diff + spec) * shadow + Ka * Ia;
 }
