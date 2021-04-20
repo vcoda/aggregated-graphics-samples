@@ -38,31 +38,33 @@ void main()
     // reconstruct normal from height map
     const float strength = 10.;
     vec3 normal = sobel(heightMap, texCoord, strength);
+	vec3 n = mat3(normalMatrix) * normal.xzy; // swap Y, Z
 
-    // view-space ray
-    const vec3 eye = vec3(0);
-    vec3 i = normalize(viewPos - eye);
+    // calculate indicent and refracted rays
+    vec3 i = normalize(viewPos);
+	vec3 r = refract(i, n, IOR_AIR/IOR_WATER);
 
     // calculate absorption path length
-    float seabedDistance = rayPlane(seabed.viewPlane, eye, i);
-    float surfaceDistance = distance(eye, viewPos);
-    float absorptionLength = seabedDistance - surfaceDistance;
-
+    float absorptionLen = rayPlaneIntersection(seabed.viewPlane, viewPos, r);
     // calculate refracted water color
-    vec3 sigma = attenuationCoefficient(surface.diffuse.rgb, 0.1);
-    vec3 refracted = absorb(sigma, absorptionLength);
-
-    vec3 l = light.viewDir.xyz;
-    vec3 n = mat3(normalMatrix) * normal.xzy; // swap Y, Z
-    vec3 r = reflect(-l, n);
-
-    // calcular specular
-    float RdV = max(dot(r, -i), 0.);
-    vec3 specular = surface.specular.rgb * pow(RdV, surface.shininess) * light.specular.rgb;
+    const float concentration = 0.1;
+    vec3 refracted = absorb(surface.diffuse.rgb, concentration, absorptionLen);
 
     // lookup cubemap for reflected color
-    vec3 reflected = texture(envMap, reflect(i, n)).rgb * 1.2;
-
+    r = reflect(i, n);
+    vec3 reflected = texture(envMap, r).rgb * 1.2;
+    
+    // calculate diffuse color
     float coeff = fresnelSchlick(IOR_AIR, IOR_WATER, n, i);
-    oColor = mix(refracted, reflected, coeff) + specular;
+    vec3 diffuse = mix(refracted, reflected, coeff);
+
+    // calculate reflected ray
+    vec3 l = light.viewDir.xyz;
+    r = reflect(-l, n);
+    // calculate specular color
+    vec3 v = -i;
+    float RdV = max(dot(r, v), 0.);
+    vec3 specular = surface.specular.rgb * pow(RdV, surface.shininess) * light.specular.rgb;
+   
+    oColor = diffuse + specular;
 }

@@ -1,5 +1,5 @@
 // https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/sld017.htm
-float rayPlane(vec4 p, vec3 ro, vec3 rd)
+float rayPlaneIntersection(vec4 p, vec3 o, vec3 d)
 {
-    return -(dot(ro, p.xyz) + p.w)/dot(rd, p.xyz);
+    return -(dot(o, p.xyz) + p.w)/dot(d, p.xyz);
 }
