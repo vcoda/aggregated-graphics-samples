@@ -40,6 +40,7 @@ protected:
     virtual void createFramebuffer();
     virtual void createCommandBuffers();
     virtual void createSyncPrimitives();
+    VkSurfaceFormatKHR chooseSurfaceFormat() const noexcept;
 
 protected:
     enum { FrontBuffer = 0, BackBuffer };

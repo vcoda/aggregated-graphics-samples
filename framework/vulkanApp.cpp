@@ -218,22 +218,10 @@ void VulkanApp::createSwapchain(bool vSync)
     }
     // Get available surface formats
     const std::vector<VkSurfaceFormatKHR> surfaceFormats = physicalDevice->getSurfaceFormats(surface);
-    VkSurfaceFormatKHR format = surfaceFormats[0];
-    if (sRGB)
-    {   // Try to find sRGB format
-        for (const auto& sRGBFormat : surfaceFormats)
-        {
-            if (VK_FORMAT_B8G8R8A8_SRGB == sRGBFormat.format &&
-                VK_COLOR_SPACE_SRGB_NONLINEAR_KHR == sRGBFormat.colorSpace)
-            {
-                format = sRGBFormat;
-                break;
-            }
-        }
-    }
+    const VkSurfaceFormatKHR surfaceFormat = chooseSurfaceFormat();
     swapchain = std::make_shared<magma::Swapchain>(device, surface,
         std::min(2U, surfaceCaps.maxImageCount),
-        format, surfaceCaps.currentExtent,
+        surfaceFormat, surfaceCaps.currentExtent,
         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, // Allow screenshots
         preTransform, compositeAlpha, presentMode, 0,
         nullptr, debugReportCallback);
@@ -242,7 +230,8 @@ void VulkanApp::createSwapchain(bool vSync)
 void VulkanApp::createRenderPass()
 {
     const std::vector<VkSurfaceFormatKHR> surfaceFormats = physicalDevice->getSurfaceFormats(surface);
-    const magma::AttachmentDescription colorAttachment(surfaceFormats[0].format, 1,
+    const VkSurfaceFormatKHR surfaceFormat = chooseSurfaceFormat();
+    const magma::AttachmentDescription colorAttachment(surfaceFormat.format, 1,
         clearOp ? magma::op::clearStore : magma::op::store,
         magma::op::dontCare,
         VK_IMAGE_LAYOUT_UNDEFINED,
@@ -285,4 +274,16 @@ void VulkanApp::createSyncPrimitives()
         constexpr bool signaled = true; // Don't wait on first render of each command buffer
         waitFences.push_back(std::make_shared<magma::Fence>(device, signaled));
     }
+}
+
+VkSurfaceFormatKHR VulkanApp::chooseSurfaceFormat() const noexcept
+{
+    const std::vector<VkSurfaceFormatKHR> surfaceFormats = physicalDevice->getSurfaceFormats(surface);
+    const VkFormat properFormat = sRGB ? VK_FORMAT_B8G8R8A8_SRGB : VK_FORMAT_B8G8R8A8_UNORM;
+    for (const auto& format : surfaceFormats)
+    {
+        if ((properFormat == format.format) && (VK_COLOR_SPACE_SRGB_NONLINEAR_KHR == format.colorSpace))
+            return format;
+    }
+    return surfaceFormats[0];
 }
