@@ -49,24 +49,31 @@ void VulkanApp::initialize()
 
 void VulkanApp::createInstance()
 {
-    const std::vector<const char *> layerNames = {
+    std::vector<const char *> layerNames;
 #ifdef _DEBUG
-        "VK_LAYER_LUNARG_standard_validation"
+    instanceLayers = std::make_unique<magma::InstanceLayers>();
+    if (instanceLayers->KHRONOS_validation)
+        layerNames.push_back("VK_LAYER_KHRONOS_validation");
+    else if (instanceLayers->LUNARG_standard_validation)
+        layerNames.push_back("VK_LAYER_LUNARG_standard_validation");
 #endif
-    };
-    const std::vector<const char *> extensionNames = {
+
+    std::vector<const char *> extensionNames = {
         VK_KHR_SURFACE_EXTENSION_NAME,
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
-        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+        VK_KHR_WIN32_SURFACE_EXTENSION_NAME
 #elif defined(VK_USE_PLATFORM_XLIB_KHR)
-        VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
+        VK_KHR_XLIB_SURFACE_EXTENSION_NAME
 #elif defined(VK_USE_PLATFORM_XCB_KHR)
-        VK_KHR_XCB_SURFACE_EXTENSION_NAME,
+        VK_KHR_XCB_SURFACE_EXTENSION_NAME
 #endif // VK_USE_PLATFORM_XCB_KHR
-#ifdef _DEBUG
-        VK_EXT_DEBUG_REPORT_EXTENSION_NAME
-#endif
     };
+    instanceExtensions = std::make_unique<magma::InstanceExtensions>();
+    if (instanceExtensions->EXT_debug_report)
+        extensionNames.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+    if (instanceExtensions->KHR_get_physical_device_properties2)
+        extensionNames.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+
     MAGMA_STACK_ARRAY(char, appName, caption.length() + 1);
 #ifdef VK_USE_PLATFORM_WIN32_KHR
     size_t count = 0;
@@ -74,17 +81,18 @@ void VulkanApp::createInstance()
 #else
     strcpy(appName, caption.c_str());
 #endif
+
     instance = std::make_shared<magma::Instance>(
         appName,
         "Magma",
         VK_API_VERSION_1_0,
         layerNames, extensionNames);
+
     debugReportCallback = std::make_shared<magma::DebugReportCallback>(
         instance,
         utilities::reportCallback);
+
     physicalDevice = instance->getPhysicalDevice(0);
-    const VkPhysicalDeviceProperties& properties = physicalDevice->getProperties();
-    instanceExtensions = std::make_unique<magma::InstanceExtensions>();
     extensions = std::make_unique<magma::PhysicalDeviceExtensions>(physicalDevice);
 }
 
