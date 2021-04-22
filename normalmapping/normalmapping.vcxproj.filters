@@ -29,5 +29,8 @@
     <CustomBuild Include="shaders\bump.frag">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="shaders\ftransform.vert">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

@@ -29,6 +29,9 @@
     <CustomBuild Include="shaders\transform.vert">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="shaders\ftransform.vert">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shaders\sobel.h">

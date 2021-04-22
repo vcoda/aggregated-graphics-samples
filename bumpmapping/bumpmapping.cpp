@@ -162,7 +162,7 @@ public:
         if (!fillPipeline)
         {
             fillPipeline = createCommonPipeline(
-                "transform.o", "fill.o",
+                "ftransform.o", "fill.o",
                 dot->getVertexInput(),
                 fillDescriptor.layout);
         }

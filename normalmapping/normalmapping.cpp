@@ -15,7 +15,7 @@ class NormalMapping : public GraphicsApp
     std::unique_ptr<quadric::Sphere> sphere;
     std::shared_ptr<magma::ImageView> normalMap;
     std::shared_ptr<magma::GraphicsPipeline> bumpPipeline;
-    std::shared_ptr<magma::GraphicsPipeline> spherePipeline;
+    std::shared_ptr<magma::GraphicsPipeline> fillPipeline;
     DescriptorSet bumpDescriptor;
     DescriptorSet fillDescriptor;
 
@@ -160,10 +160,10 @@ public:
             std::move(specialization),
             torus->getVertexInput(),
             bumpDescriptor.layout);
-        if (!spherePipeline)
+        if (!fillPipeline)
         {
-            spherePipeline = createCommonPipeline(
-                "transform.o", "fill.o",
+            fillPipeline = createCommonPipeline(
+                "ftransform.o", "fill.o",
                 sphere->getVertexInput(),
                 fillDescriptor.layout);
         }
@@ -182,8 +182,8 @@ public:
                 cmdBuffer->bindPipeline(bumpPipeline);
                 cmdBuffer->bindDescriptorSet(bumpPipeline, bumpDescriptor.set, transforms->getDynamicOffset(0));
                 torus->draw(cmdBuffer);
-                cmdBuffer->bindPipeline(spherePipeline);
-                cmdBuffer->bindDescriptorSet(spherePipeline, fillDescriptor.set, transforms->getDynamicOffset(1));
+                cmdBuffer->bindPipeline(fillPipeline);
+                cmdBuffer->bindDescriptorSet(fillPipeline, fillDescriptor.set, transforms->getDynamicOffset(1));
                 sphere->draw(cmdBuffer);
             }
             cmdBuffer->endRenderPass();
