@@ -37,7 +37,7 @@ class DeferredShading : public GraphicsApp
 
 public:
     DeferredShading(const AppEntry& entry):
-        GraphicsApp(entry, TEXT("Deferred shading"), 1280, 720, true)
+        GraphicsApp(entry, TEXT("Deferred shading"), 1280, 720, true, true)
     {
         setupViewProjection();
         setupTransforms();
@@ -285,7 +285,8 @@ public:
             gbufferBlendState,
             gbuffer,
             gbTexDescriptor.layout);
-        deferredPipeline = createFullscreenPipeline("quad.o", "deferred.o", dsDescriptor.layout);
+		// Draw to main framebuffer (not MSAA)
+        deferredPipeline = createFullscreenPipeline("quad.o", "deferred.o", nullptr, dsDescriptor.layout, framebuffers[0]);
     }
 
     void renderScene(uint32_t bufferIndex)

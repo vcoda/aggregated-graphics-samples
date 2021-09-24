@@ -1,4 +1,5 @@
 #pragma once
+#include <thread>
 #include "core/platform.h"
 #include "core/aligned.h"
 #include "core/noncopyable.h"
@@ -54,6 +55,11 @@ protected:
     {
         if (AppKey::Escape == key)
             close();
+    }
+
+    void sleep(long ms) const noexcept
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(ms));
     }
 
 protected:

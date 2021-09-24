@@ -67,7 +67,6 @@ protected:
 
     void blit(std::shared_ptr<const magma::ImageView> imageView, uint32_t bufferIndex);
     void submitCommandBuffers(uint32_t bufferIndex);
-    void sleep(long ms) noexcept;
 
 protected:
     std::unique_ptr<magma::aux::ColorMultisampleFramebuffer> msaaFramebuffer;

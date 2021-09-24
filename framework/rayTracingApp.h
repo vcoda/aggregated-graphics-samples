@@ -1,6 +1,7 @@
 #pragma once
 #include "vulkanApp.h"
 #include "common.h"
+#include "viewProjection.h"
 #include "arcball.h"
 #include "timer.h"
 
@@ -17,10 +18,13 @@ protected:
     virtual void enableDeviceFeaturesExt(std::vector<void *>& features) const override;
     virtual void enableExtensions(std::vector<const char*>& extensionNames) const override;
     void createOutputImage(VkFormat colorFormat);
-    std::shared_ptr<magma::ShaderModule> loadShader(const char *shaderFileName) const;
+    std::shared_ptr<magma::ShaderModule> loadShader(const char *shaderFileName, bool reflect = false) const;
+    magma::PipelineShaderStage loadShaderStage(const char *shaderFileName,
+        std::shared_ptr<magma::Specialization> specialization = nullptr) const;
     magma::PipelineShaderStage loadShaderStage(const char *shaderFileName, VkShaderStageFlagBits stage,
         std::shared_ptr<magma::Specialization> specialization = nullptr) const;
     void resizeScratchBuffer(VkDeviceSize size);
+    void updateViewProjTransforms();
     void blit(std::shared_ptr<const magma::ImageView> imageView, uint32_t bufferIndex);
     void submitCommandBuffers(uint32_t bufferIndex);
 
@@ -35,6 +39,7 @@ protected:
     std::shared_ptr<magma::Semaphore> rtSemaphore;
     std::shared_ptr<magma::DescriptorPool> descriptorPool;
 
+    std::shared_ptr<magma::Sampler> nearestClampToEdge;
     std::shared_ptr<magma::Sampler> nearestRepeat;
     std::shared_ptr<magma::Sampler> bilinearRepeat;
     std::shared_ptr<magma::Sampler> trilinearRepeat;
@@ -48,8 +53,11 @@ protected:
 
     std::shared_ptr<magma::UniformBuffer<LightSource>> lightSource;
     std::shared_ptr<magma::UniformBuffer<RtTransforms>> transforms;
+    std::shared_ptr<magma::UniformBuffer<ViewProjTransforms>> viewProjTransforms;
 
     std::unique_ptr<magma::aux::BlitRectangle> bltRect;
+
+    std::unique_ptr<ViewProjection> viewProj;
     std::shared_ptr<Arcball> arcball;
     std::unique_ptr<Timer> timer;
     int mouseX = 0;

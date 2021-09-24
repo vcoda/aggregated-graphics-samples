@@ -160,7 +160,10 @@ public:
 
     void edgeDetectPass(std::shared_ptr<magma::CommandBuffer> cmdBuffer)
     {
-        cmdBuffer->beginRenderPass(msaaFramebuffer->getRenderPass(), msaaFramebuffer->getFramebuffer());
+        cmdBuffer->beginRenderPass(msaaFramebuffer->getRenderPass(), msaaFramebuffer->getFramebuffer(),
+            {
+                magma::clears::blueColor
+            });
         {
             bltRect->blit(cmdBuffer,
                 depthFramebuffer->getDepthView(),

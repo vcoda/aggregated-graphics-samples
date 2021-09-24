@@ -421,8 +421,3 @@ void GraphicsApp::submitCommandBuffers(uint32_t bufferIndex)
         renderFinished,
         waitFences[bufferIndex]);
 }
-
-void GraphicsApp::sleep(long ms) noexcept
-{
-    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-}

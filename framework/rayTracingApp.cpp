@@ -27,6 +27,7 @@ RayTracingApp::RayTracingApp(const AppEntry& entry, const core::tstring& caption
     createSamplers();
     // Create uniform buffers
     lightSource = std::make_shared<magma::UniformBuffer<LightSource>>(device);
+    viewProjTransforms = std::make_shared<magma::UniformBuffer<ViewProjTransforms>>(device);
     // Create common objects
     bltRect = std::make_unique<magma::aux::BlitRectangle>(renderPass);
     arcball = std::shared_ptr<Trackball>(new Trackball(rapid::vector2(width/2.f, height/2.f), 300.f, false));
@@ -37,6 +38,7 @@ void RayTracingApp::enableDeviceFeatures(VkPhysicalDeviceFeatures& features) con
 {
     features.samplerAnisotropy = VK_TRUE;
     features.textureCompressionBC = VK_TRUE;
+    features.shaderStorageImageMultisample = VK_TRUE;
 }
 
 void RayTracingApp::enableDeviceFeaturesExt(std::vector<void *>& features) const
@@ -78,13 +80,14 @@ void RayTracingApp::createOutputImage(VkFormat colorFormat)
 
 void RayTracingApp::createSamplers()
 {
+    nearestClampToEdge = std::make_shared<magma::Sampler>(device, magma::samplers::magMinMipNearestClampToEdge);
     nearestRepeat = std::make_shared<magma::Sampler>(device, magma::samplers::magMinMipNearestRepeat);
     bilinearRepeat = std::make_shared<magma::Sampler>(device, magma::samplers::magMinLinearMipNearestRepeat);
     trilinearRepeat = std::make_shared<magma::Sampler>(device, magma::samplers::magMinMipLinearRepeat);
     anisotropicRepeat = std::make_shared<magma::Sampler>(device, magma::samplers::magMinLinearMipAnisotropicRepeat);
 }
 
-std::shared_ptr<magma::ShaderModule> RayTracingApp::loadShader(const char *shaderFileName) const
+std::shared_ptr<magma::ShaderModule> RayTracingApp::loadShader(const char *shaderFileName, bool reflect /* false */) const
 {
     std::ifstream file(shaderFileName, std::ios::in | std::ios::binary);
     if (!file.is_open())
@@ -93,13 +96,22 @@ std::shared_ptr<magma::ShaderModule> RayTracingApp::loadShader(const char *shade
     if (bytecode.size() % sizeof(magma::SpirvWord))
         throw std::runtime_error("size of \"" + std::string(shaderFileName) + "\" bytecode must be a multiple of SPIR-V word");
     return std::make_shared<magma::ShaderModule>(device, reinterpret_cast<const magma::SpirvWord *>(bytecode.data()), bytecode.size(),
-        0, 0, false, device->getAllocator());
+        0, 0, reflect, device->getAllocator());
+}
+
+magma::PipelineShaderStage RayTracingApp::loadShaderStage(const char *shaderFileName,
+    std::shared_ptr<magma::Specialization> specialization /* nullptr */) const
+{
+    std::shared_ptr<magma::ShaderModule> module = loadShader(shaderFileName, true);
+    const VkShaderStageFlagBits stage = module->getReflection()->getShaderStage();
+    const char *const entrypoint = module->getReflection()->getEntryPointName(0);
+    return magma::PipelineShaderStage(stage, std::move(module), entrypoint, std::move(specialization));
 }
 
 magma::PipelineShaderStage RayTracingApp::loadShaderStage(const char *shaderFileName, VkShaderStageFlagBits stage,
     std::shared_ptr<magma::Specialization> specialization /* nullptr */) const
 {
-    std::shared_ptr<magma::ShaderModule> module = loadShader(shaderFileName);
+    std::shared_ptr<magma::ShaderModule> module = loadShader(shaderFileName, false);
     return magma::PipelineShaderStage(stage, std::move(module), "main", std::move(specialization));
 }
 
@@ -107,6 +119,23 @@ void RayTracingApp::resizeScratchBuffer(VkDeviceSize size)
 {
     if (!scratchBuffer || scratchBuffer->getSize() < size)
         scratchBuffer = std::make_shared<magma::RayTracingBuffer>(device, size);
+}
+
+void RayTracingApp::updateViewProjTransforms()
+{
+    viewProj->updateView();
+    viewProj->updateProjection();
+    magma::helpers::mapScoped(viewProjTransforms,
+        [this](auto* transforms)
+        {
+            transforms->view = viewProj->getView();
+            transforms->viewInv = viewProj->getViewInv();
+            transforms->proj = viewProj->getProj();
+            transforms->projInv = viewProj->getProjInv();
+            transforms->viewProj = viewProj->getViewProj();
+            transforms->viewProjInv = rapid::inverse(viewProj->getViewProj());
+            transforms->shadowProj = rapid::identity();
+        });
 }
 
 void RayTracingApp::blit(std::shared_ptr<const magma::ImageView> imageView, uint32_t bufferIndex)
